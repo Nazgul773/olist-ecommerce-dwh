@@ -16,7 +16,43 @@ SELECT COUNT(*) AS total_rows
 FROM raw.customers;
 
 
--- 2. Null Analysis
+-- 2. Min/Max Character Length per Column
+-- ============================================================
+SELECT column_name, MIN(length) AS min_length, MAX(length) AS max_length
+FROM (
+    SELECT 'customer_id'              AS column_name, LEN(customer_id)              AS length FROM raw.customers
+    UNION ALL
+    SELECT 'customer_unique_id'       AS column_name, LEN(customer_unique_id)       AS length FROM raw.customers
+    UNION ALL
+    SELECT 'customer_zip_code_prefix' AS column_name, LEN(customer_zip_code_prefix) AS length FROM raw.customers
+    UNION ALL
+    SELECT 'customer_city'            AS column_name, LEN(customer_city)            AS length FROM raw.customers
+    UNION ALL
+    SELECT 'customer_state'           AS column_name, LEN(customer_state)           AS length FROM raw.customers
+) AS lengths
+GROUP BY column_name
+ORDER BY column_name;
+
+
+-- 3. Min/Max Character Length per Column (quotes cleansed)
+-- ============================================================
+SELECT column_name, MIN(length) AS min_length, MAX(length) AS max_length
+FROM (
+    SELECT 'customer_id'              AS column_name, LEN(TRIM(REPLACE(customer_id,              '"', ''))) AS length FROM raw.customers
+    UNION ALL
+    SELECT 'customer_unique_id'       AS column_name, LEN(TRIM(REPLACE(customer_unique_id,       '"', ''))) AS length FROM raw.customers
+    UNION ALL
+    SELECT 'customer_zip_code_prefix' AS column_name, LEN(TRIM(REPLACE(customer_zip_code_prefix, '"', ''))) AS length FROM raw.customers
+    UNION ALL
+    SELECT 'customer_city'            AS column_name, LEN(TRIM(customer_city))                              AS length FROM raw.customers
+    UNION ALL
+    SELECT 'customer_state'           AS column_name, LEN(TRIM(customer_state))                             AS length FROM raw.customers
+) AS lengths
+GROUP BY column_name
+ORDER BY column_name;
+
+
+-- 4. Null Analysis
 -- ============================================================
 SELECT
     SUM(CASE WHEN customer_id IS NULL THEN 1 ELSE 0 END)             AS null_customer_id,
@@ -27,7 +63,7 @@ SELECT
 FROM raw.customers;
 
 
--- 3. Duplicate customer_id
+-- 5. Duplicate customer_id
 -- ============================================================
 SELECT customer_id, COUNT(*) AS cnt
 FROM raw.customers
@@ -35,7 +71,7 @@ GROUP BY customer_id
 HAVING COUNT(*) > 1;
 
 
--- 4. Duplicate customer_unique_id
+-- 6. Duplicate customer_unique_id
 -- ============================================================
 SELECT customer_unique_id, COUNT(*) AS cnt
 FROM raw.customers
@@ -44,7 +80,7 @@ HAVING COUNT(*) > 1
 ORDER BY cnt DESC;
 
 
--- 5. Difference: customer_id vs customer_unique_id
+-- 7. Difference: customer_id vs customer_unique_id
 -- ============================================================
 SELECT
     COUNT(*)                            AS total_rows,
@@ -54,7 +90,7 @@ SELECT
 FROM raw.customers;
 
 
--- 6. Distribution by State
+-- 8. Distribution by State
 -- ============================================================
 SELECT
     customer_state,
@@ -65,7 +101,7 @@ GROUP BY customer_state
 ORDER BY cnt DESC;
 
 
--- 7. Top 10 Cities by Customer Count
+-- 9. Top 10 Cities by Customer Count
 -- ============================================================
 SELECT TOP 10
     customer_city,
@@ -84,7 +120,7 @@ GROUP BY customer_city
 ORDER BY cnt DESC;
 
 
--- 8. Outliers: Cities with Inconsistent State Assignment
+-- 10. Outliers: Cities with Inconsistent State Assignment
 -- ============================================================
 SELECT
     customer_city,
