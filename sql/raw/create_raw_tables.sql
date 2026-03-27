@@ -3,7 +3,8 @@ GO
 
 -- olist_customers_dataset.csv
 CREATE TABLE raw.[customers] (
-    [load_id]                   INT IDENTITY(1,1)   NOT NULL,
+    [row_id]                    INT IDENTITY(1,1)   NOT NULL,
+    [batch_id]                  UNIQUEIDENTIFIER    NOT NULL,
     [customer_id]               NVARCHAR(255),
     [customer_unique_id]        NVARCHAR(255),
     [customer_zip_code_prefix]  NVARCHAR(255),
@@ -11,7 +12,7 @@ CREATE TABLE raw.[customers] (
     [customer_state]            NVARCHAR(255),
     [load_ts]                   DATETIME            NOT NULL DEFAULT GETDATE(),
     [file_name]                 NVARCHAR(255)       NOT NULL,
-    CONSTRAINT PK_raw_customers PRIMARY KEY (load_id)
+    CONSTRAINT PK_raw_customers PRIMARY KEY (row_id)
 );
 GO
 

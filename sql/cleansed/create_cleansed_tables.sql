@@ -5,14 +5,15 @@ GO
 -- DDL: cleansed.error_log
 -- ============================================================
 CREATE TABLE cleansed.error_log (
-    log_id          INT IDENTITY(1,1)   NOT NULL,
-    table_name      NVARCHAR(100)       NOT NULL,
-    raw_key         NVARCHAR(100)       NULL,
-    column_name     NVARCHAR(100)       NOT NULL,
-    issue           NVARCHAR(255)       NOT NULL,
-    raw_value       NVARCHAR(MAX)       NULL,
+    [row_id]          INT IDENTITY(1,1)   NOT NULL,
+    [batch_id]        UNIQUEIDENTIFIER    NOT NULL,
+    [table_name]      NVARCHAR(100)       NOT NULL,
+    [raw_key]         NVARCHAR(100)       NULL,
+    [column_name]     NVARCHAR(100)       NOT NULL,
+    [issue]           NVARCHAR(255)       NOT NULL,
+    [raw_value]       NVARCHAR(MAX)       NULL,
     logged_at       DATETIME            NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT PK_error_log PRIMARY KEY (log_id)
+    CONSTRAINT PK_error_log PRIMARY KEY (row_id)
 );
 GO
 

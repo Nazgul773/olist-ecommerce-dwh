@@ -3,13 +3,16 @@ GO
 
 CREATE OR ALTER PROCEDURE raw.sp_load_customers
     @file_path  NVARCHAR(500),
-    @file_name  NVARCHAR(255)
+    @file_name  NVARCHAR(255),
+    @batch_id   UNIQUEIDENTIFIER OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
 
     DECLARE @sql  NVARCHAR(MAX);
     DECLARE @rows INT;
+
+    SET @batch_id = NEWID();
 
     BEGIN TRY
         -- --------------------------------------------------------
@@ -44,6 +47,7 @@ BEGIN
         -- 3. Append from temp into raw with meta columns
         -- --------------------------------------------------------
         INSERT INTO raw.customers (
+            batch_id,
             customer_id,
             customer_unique_id,
             customer_zip_code_prefix,
@@ -53,6 +57,7 @@ BEGIN
             file_name
         )
         SELECT
+            @batch_id,
             customer_id,
             customer_unique_id,
             customer_zip_code_prefix,
@@ -64,6 +69,7 @@ BEGIN
 
         SET @rows = @@ROWCOUNT;
         PRINT 'raw.customers loaded: ' + CAST(@rows AS NVARCHAR) + ' rows';
+        PRINT 'Batch ID: ' + CAST(@batch_id AS NVARCHAR(36));
         PRINT 'File: ' + @file_name;
         PRINT 'Load timestamp: ' + CONVERT(NVARCHAR, GETDATE(), 120);
 
