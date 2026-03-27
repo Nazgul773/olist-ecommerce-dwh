@@ -22,6 +22,9 @@ DECLARE @batch_id_product_category_translation  UNIQUEIDENTIFIER;
 -- 1. Raw load
 -- ============================================================
 
+PRINT '------------------raw load starting---------------------'
+PRINT '--------------------------------------------------------'
+
 SET @file_path = @base + 'olist_customers_dataset.csv';
 EXEC raw.sp_load_customers
     @file_path = @file_path,
@@ -76,11 +79,15 @@ EXEC raw.sp_load_product_category_name_translation
     @file_name = 'product_category_name_translation.csv',
     @batch_id  = @batch_id_product_category_translation OUTPUT;
 
-PRINT '=> raw load complete';
 
+PRINT '------------------raw load complete---------------------'
+PRINT '--------------------------------------------------------'
 -- ============================================================
 -- 2. Cleansed load
 -- ============================================================
+
+PRINT '----------------cleanse load starting-------------------'
+PRINT '--------------------------------------------------------'
 
 EXEC cleansed.sp_load_customers
     @batch_id = @batch_id_customers;
@@ -109,4 +116,5 @@ EXEC cleansed.sp_load_sellers
 EXEC cleansed.sp_load_product_category_name_translation
     @batch_id = @batch_id_product_category_translation;
 
-PRINT '=> cleansed load complete';
+PRINT '----------------cleanse load complete-------------------'
+PRINT '--------------------------------------------------------'
