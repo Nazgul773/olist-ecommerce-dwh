@@ -20,3 +20,7 @@ data/
 
 # Environment
 .env
+
+# Pipelines
+sql/master_load_raw.sql
+sql/master_load_cleansed.sql
