@@ -78,7 +78,7 @@ olist-ecommerce-dwh/
 │   └── generate_create_tables.py
 └── sql/
     ├── create_schemas.sql
-    ├── master_load_full.sql
+    ├── exec_full_load.sql
     ├── raw/
     │   ├── create_raw_tables.sql
     │   ├── sps/
@@ -122,7 +122,7 @@ Zusätzlich werden Datenfehler (NULL-Werte, ungültige Längen, leere Strings) v
 Die Orchestrierung erfolgt über Master-Skripte in SSMS, die `batch_id` wird per `OUTPUT`-Parameter von Raw an Cleansed übergeben. In einer produktiven Umgebung würde dies über SQL Server Agent Jobs oder Azure Data Factory abgebildet – die SP-Logik bleibt dabei identisch.
 
 ```
-master_load_full.sql     → Standardlauf: Raw + Cleansed + Mart
+exec_full_load.sql     → Standardlauf: Raw + Cleansed + Mart
 ```
 
 ---
@@ -150,5 +150,5 @@ master_load_full.sql     → Standardlauf: Raw + Cleansed + Mart
 3. Cleansed-Tabellen erstellen → `sql/cleansed/create_cleansed_tables.sql`
 4. Mart-Tabellen erstellen → `sql/mart/create_mart_tables.sql`
 5. Stored Procedures deployen → alle `sps/` Ordner
-6. Basispfad im Master-Skript anpassen → in `sql/master_load_full.sql`
-7. Pipeline ausführen → `sql/master_load_full.sql`
+6. Basispfad im Master-Skript anpassen → in `sql/exec_full_load.sql`
+7. Pipeline ausführen → `sql/exec_full_load.sql`
