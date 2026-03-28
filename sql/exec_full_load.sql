@@ -1,8 +1,8 @@
 -- ============================================================
 -- Executes the full load pipeline across all layers.
--- Raw:     Loads source CSV files via BULK INSERT (append-only, batch-tracked).
+-- Raw:      Loads source CSV files via BULK INSERT (append-only, batch-tracked).
 -- Cleansed: Applies incremental MERGE with row-hash-based change detection, DQ checks and error logging.
--- Mart:    Joins and aggregates cleansed data into Star-Schema fact and dimension tables. (not implemented yet)
+-- Mart:     Joins and aggregates cleansed data into Star-Schema fact and dimension tables. (not implemented yet)
 -- ============================================================
 USE OlistDWH;
 GO
