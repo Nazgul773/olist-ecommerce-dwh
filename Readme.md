@@ -138,31 +138,17 @@ master_load_full.sql     → Standardlauf: Raw + Cleansed + Mart
 
 ---
 
-## Lokale Ausführung
-
 **Voraussetzungen:**
 - MS SQL Server (Developer Edition oder höher)
 - SSMS
-- Olist-Datensatz lokal verfügbar
+- Olist-Datensatz lokal verfügbar ([Kaggle Download](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce))
 
 **Setup:**
-```sql
--- 1. Schemas anlegen
--- sql/create_schemas.sql
 
--- 2. Raw-Tabellen erstellen
--- sql/raw/create_raw_tables.sql
-
--- 3. Cleansed-Tabellen erstellen
--- sql/cleansed/create_cleansed_tables.sql
-
--- 4. Mart-Tabellen erstellen
--- sql/mart/create_mart_tables.sql
-
--- 5. Stored Procedures deployen (alle sps/ Ordner)
-
--- 6. Pfad in Master-Skript anpassen
-
--- 7. Pipeline ausführen
--- sql/master_load_full.sql
-```
+1. Schemas anlegen → `sql/create_schemas.sql`
+2. Raw-Tabellen erstellen → `sql/raw/create_raw_tables.sql`
+3. Cleansed-Tabellen erstellen → `sql/cleansed/create_cleansed_tables.sql`
+4. Mart-Tabellen erstellen → `sql/mart/create_mart_tables.sql`
+5. Stored Procedures deployen → alle `sps/` Ordner
+6. Basispfad im Master-Skript anpassen → in `sql/master_load_full.sql`
+7. Pipeline ausführen → `sql/master_load_full.sql`
