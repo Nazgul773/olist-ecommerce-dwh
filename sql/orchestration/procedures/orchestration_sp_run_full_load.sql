@@ -22,7 +22,7 @@ BEGIN
         EXEC orchestration.sp_run_layer 'MART',     @job_run_id;
     END TRY
     BEGIN CATCH
-        -- Count results from load_log via job_run_id (avoids time-based join assumptions).
+        -- Count results from load_log via job_run_id.
         SELECT
             @pipelines_failed = COUNT(DISTINCT CASE WHEN status = 'FAILED' THEN pipeline_id END),
             @pipelines_total  = COUNT(DISTINCT pipeline_id)

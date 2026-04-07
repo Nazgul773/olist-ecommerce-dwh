@@ -16,7 +16,6 @@ CREATE TABLE orchestration.pipeline_config (
     last_run_status    NVARCHAR(20)     NULL,
     last_batch_id      UNIQUEIDENTIFIER NULL,
     -- Points to the upstream pipeline whose last_batch_id this pipeline reads.
-    -- NULL for RAW (no upstream). Avoids hardcoding sp_name strings in SPs.
     source_pipeline_id INT              NULL,
     created_ts         DATETIME2(3)     NOT NULL DEFAULT SYSUTCDATETIME(),
     modified_ts        DATETIME2(3)     NULL,
