@@ -1,19 +1,106 @@
-# Olist E-Commerce Data Warehouse (MSSQL)
+# Olist E-Commerce Data Warehouse (SQL Server)
 
-End-to-End Data Warehouse auf Basis eines produktiven, anonymisierten E-Commerce Datensatzes (~100.000 Transaktionen). Grundlage der Pipeline-Konzeption bildete eine explorative Datenanalyse (EDA) je Rohdatentabelle.
+End-to-End Data Warehouse auf Basis des öffentlichen [Olist Brazilian E-Commerce Datensatzes](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — rund 100.000 Transaktionen aus dem brasilianischen E-Commerce-Markt.
 
-Die Pipeline umfasst drei Schichten:
-- **Raw** – unveränderte Rohdaten-Landezone mit Append-Only-Historisierung
-- **Cleansed** – inkrementelles Ladekonzept mit Row-Hash-basierter Änderungserkennung, Datenqualitätsprüfungen und Error Logging
-- **Mart** – Star-Schema mit Nonclustered Columnstore-Indizierung als Grundlage für ein performantes Power BI Reporting
+Ziel des Projekts ist eine produktionsnahe DWH-Pipeline in SQL Server mit Batch-Historisierung, inkrementellem Ladekonzept und vollständigem Audit-Trail. Die Pipeline implementiert gängige Patterns aus der Praxis: Metadata-Driven Orchestrierung über eine zentrale Konfigurationstabelle, Datenqualitätsprüfung, Soft Delete und transaktionssichere Stored Procedures.
+
+---
+
+## Architektur
+
+```
+CSV-Dateien
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  RAW                                                            │
+│  Append-Only Staging · Batch-Historisierung · keine Transformation │
+│  Metafelder: batch_id, load_ts, file_name                       │
+└─────────────────────────────────────────────────────────────────┘
+    │  batch_id wird an CLEANSED weitergegeben
+    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  CLEANSED                                                       │
+│  Inkrementelles Ladekonzept via MERGE · SHA2-256 Row-Hash       │
+│  DQ-Checks (Completeness, Validity, Uniqueness)                 │
+│  Soft Delete für quellengetreue Historisierung                  │
+└─────────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  MART                                                           │
+│  Star-Schema · Fakten- und Dimensionstabellen                   │
+│  (in Entwicklung)                                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Querschnittsschemas
+
+| Schema | Inhalt |
+|---|---|
+| `audit` | `load_log`, `error_log`, `dq_log`, `job_log` — vollständiger Audit-Trail jedes Ladevorgangs |
+| `orchestration` | `pipeline_config` (Metadata Framework), `sp_run_layer`, `sp_run_full_load`, SQL Server Agent Job |
+
+---
+
+## Pipeline-Design
+
+### Raw — Append-Only Staging mit Batch-Historisierung
+
+Jeder Load erhält eine eindeutige `batch_id` (GUID), die allen Zeilen des Batches zugewiesen wird. Die raw-Tabellen wachsen mit jedem Load — Historisierung auf Batch-Ebene ist damit vollständig gewährleistet. Non-Clustered Indexes auf `batch_id` stellen sicher, dass der `WHERE batch_id = @batch_id`-Filter in den CLEANSED-SPs als Index Seek ausgeführt wird.
+
+### Cleansed — Inkrementelles Ladekonzept
+
+Der CLEANSED-Layer liest aus RAW über die `batch_id` des letzten erfolgreichen RAW-Loads. Das MERGE-Statement erkennt Änderungen über einen SHA2-256-Hash aller fachlichen Spalten:
+
+```sql
+HASHBYTES('SHA2_256', CONCAT(col1, '|', col2, '|', ...)) AS row_hash
+```
+
+Zeilen, die im aktuellen Batch nicht mehr vorkommen, werden **soft-deleted** (`is_deleted = 1`, `deleted_at`) statt physisch gelöscht — der Audit-Trail und Mart-FK-Referenzen bleiben intakt. Wiederauftauchende Datensätze werden automatisch reaktiviert.
+
+### Datenqualitätsprüfung
+
+Vor jedem MERGE läuft eine CTE-basierte DQ-Prüfung über drei Dimensionen:
+
+| Dimension | Prüfungen |
+|---|---|
+| **Completeness** | NULL-Werte, leere Strings nach Bereinigung |
+| **Validity** | Länge, Format (Hex-IDs, numerische Felder, Datumsformat), Wertemenge (z.B. `order_status`), logische Konsistenz (z.B. Lieferdatum vor Kaufdatum) |
+| **Uniqueness** | Duplikate des Primärschlüssels innerhalb eines Batches |
+
+Ergebnisse werden in `audit.dq_log` geschrieben. Bei Duplikaten wird der MERGE mit einem expliziten `THROW` abgebrochen.
+
+### Transaktionsmanagement
+
+RUNNING-Eintrag und DQ-Log werden **außerhalb** der Transaktion geschrieben — sie überleben einen Rollback und bleiben für die Fehlerdiagnose querybar. MERGE + SUCCESS-Update laufen **innerhalb** einer expliziten Transaktion und committen atomar.
+
+### Metadata-Driven Orchestrierung
+
+Der Kern der Orchestrierung ist die Tabelle `orchestration.pipeline_config` — ein Metadata Framework, das alle ETL-Pipelines zentral konfiguriert und steuert:
+
+```
+pipeline_config
+├── sp_name            → welche SP wird aufgerufen
+├── source_pipeline_id → FK auf die upstream RAW-Pipeline
+├── file_path / file_name → Quelldatei
+├── load_sequence      → Ausführungsreihenfolge innerhalb eines Layers
+├── is_active          → Pipeline ein-/ausschaltbar ohne Code-Änderung
+└── last_run_status / last_batch_id → Laufzeitstatus, wird nach jedem Load aktualisiert
+```
+
+Die Orchestrierungs-SPs lesen ausschließlich aus dieser Tabelle — neue Entities erfordern nur einen neuen `pipeline_config`-Eintrag, keine Änderung an der Orchestrierungslogik.
+
+- `orchestration.sp_run_full_load` — startet einen vollständigen Lauf über alle Layer, schreibt in `audit.job_log`
+- `orchestration.sp_run_layer` — iteriert über alle aktiven Pipelines eines Layers (Cursor, `load_sequence`-Reihenfolge), validiert `sp_name` gegen `sys.procedures`, stoppt bei erstem Fehler
+
+Der SQL Server Agent Job (`agent_job_full_load.sql`) ruft `sp_run_full_load` auf und ermöglicht automatisiertes Scheduling des vollständigen Pipeline-Laufs — täglich, wöchentlich oder nach individueller Konfiguration — ohne manuellen Eingriff.
 
 ---
 
 ## Datenbasis
 
 **Quelle:** [Olist Brazilian E-Commerce – Kaggle](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
-
-9 CSV-Dateien mit Informationen zu Bestellungen, Kunden, Produkten, Verkäufern, Zahlungen, Bewertungen und Geodaten.
 
 | Datei | Inhalt |
 |---|---|
@@ -25,35 +112,53 @@ Die Pipeline umfasst drei Schichten:
 | `olist_products_dataset.csv` | Produktstammdaten |
 | `olist_sellers_dataset.csv` | Verkäuferstammdaten |
 | `olist_geolocation_dataset.csv` | PLZ-Geodaten |
-| `product_category_name_translation.csv` | Kategorie-Übersetzungen |
+| `product_category_name_translation.csv` | Kategorie-Übersetzungen (PT → EN) |
 
 ---
 
-## Architektur
+## Projektstruktur
 
 ```
-CSV-Dateien
-    │
-    ▼
-┌──────────────────────────────────────────────────────┐
-│  RAW                                                 │
-│  Append-Only · Historisierung · keine Transformation │
-│  Metafelder: row_id, batch_id, load_ts, file_name    │
-└──────────────────────────────────────────────────────┘
-    │
-    ▼
-┌──────────────────────────────────────────────────┐
-│  CLEANSED                                        │
-│  Incremental Load (MERGE) · Row-Hash · DQ-Checks │
-│  Normalisierung, Typbereinigung, Error Logging   │
-└──────────────────────────────────────────────────┘
-    │
-    ▼
-┌─────────────────────────────────────────────────┐
-│  MART                                           │
-│  Star-Schema · Dimensionen & Faktentabellen     │
-│  (in Entwicklung)                               │
-└─────────────────────────────────────────────────┘
+olist-ecommerce-dwh/
+├── sql/
+│   ├── create_schemas.sql
+│   ├── migrations/
+│   │   └── V001__disable_non_customers_pipelines.sql
+│   ├── audit/
+│   │   └── schema/
+│   │       └── create_audit_tables.sql
+│   ├── raw/
+│   │   ├── schema/
+│   │   │   └── create_raw_tables.sql
+│   │   ├── procedures/
+│   │   │   ├── raw_sp_load_customers.sql
+│   │   │   ├── raw_sp_load_orders.sql
+│   │   │   └── ...
+│   │   └── eda/
+│   │       ├── eda_customers.sql
+│   │       ├── eda_orders.sql
+│   │       └── ...
+│   ├── cleansed/
+│   │   ├── schema/
+│   │   │   └── create_cleansed_tables.sql
+│   │   └── procedures/
+│   │       ├── cleansed_sp_load_customers.sql
+│   │       ├── cleansed_sp_load_orders.sql
+│   │       └── ...
+│   ├── mart/    # in Entwicklung
+│   └── orchestration/
+│       ├── schema/
+│       │   ├── create_orchestration_tables.sql
+│       │   └── create_orchestration_triggers.sql
+│       ├── procedures/
+│       │   ├── orchestration_sp_run_full_load.sql
+│       │   └── orchestration_sp_run_layer.sql
+│       ├── config/
+│       │   └── dev_pipeline_config.sql
+│       └── jobs/
+│           └── agent_job_full_load.sql
+└── python/
+    └── generate_create_tables.py
 ```
 
 ---
@@ -62,68 +167,11 @@ CSV-Dateien
 
 | Tool | Verwendung |
 |---|---|
-| **MS SQL Server** | Datenbank, Pipeline-Logik |
-| **SSMS** | Entwicklung, Testing, Pipeline-Ausführung |
-| **Visual Studio Code** | Code-Verwaltung, Projektstruktur |
-| **GitHub** | Versionierung |
+| **MS SQL Server** | Datenbank, gesamte Pipeline-Logik |
+| **SSMS** | Entwicklung, Testing, lokale Ausführung |
+| **SQL Server Agent** | Job-Scheduling (produktive Ausführung) |
 | **Python** | DDL-Generierung |
-
----
-
-## Projektstruktur
-
-```
-olist-ecommerce-dwh/
-├── python/
-│   └── generate_create_tables.py
-└── sql/
-    ├── create_schemas.sql
-    ├── exec_full_load.sql
-    ├── raw/
-    │   ├── create_raw_tables.sql
-    │   ├── sps/
-    │   │   ├── raw_sp_load_customers.sql
-    │   │   ├── raw_sp_load_orders.sql
-    │   │   └── ...
-    │   └── eda/
-    │       ├── eda_customers.sql
-    │       ├── eda_orders.sql
-    │       └── ...
-    ├── cleansed/
-    │   ├── create_cleansed_tables.sql
-    │   └── sps/
-    │       ├── cleansed_sp_load_customers.sql
-    │       ├── cleansed_sp_load_orders.sql
-    │       └── ...
-    └── mart/
-        └── (in Entwicklung)
-```
-
----
-
-## Pipeline-Design
-
-### Raw – Append-Only mit Historisierung
-
-Jeder Load-Vorgang erhält eine eindeutige `batch_id` (GUID), die allen Zeilen eines Loads zugewiesen wird. Dadurch ist jeder Ladevorgang vollständig nachvollziehbar und isolierbar.
-
-### Cleansed – Incremental Load mit Row-Hash
-
-Der Cleansed-Layer verwendet `MERGE` mit einem SHA2-256-Hash über alle fachlichen Spalten. Eine Zeile wird nur aktualisiert wenn sich der Hash geändert hat – unnötige Updates werden vermieden.
-
-```sql
-HASHBYTES('SHA2_256', CONCAT(col1, '|', col2, '|', ...)) AS row_hash
-```
-
-Zusätzlich werden Datenfehler (NULL-Werte, ungültige Längen, leere Strings) vor dem MERGE in `cleansed.error_log` protokolliert. Fehlerhafte Zeilen werden gefiltert und nicht in Cleansed übernommen.
-
-### Orchestrierung
-
-Die Orchestrierung erfolgt über Master-Skripte in SSMS, die `batch_id` wird per `OUTPUT`-Parameter von Raw an Cleansed übergeben. In einer produktiven Umgebung würde dies über SQL Server Agent Jobs oder Azure Data Factory abgebildet – die SP-Logik bleibt dabei identisch.
-
-```
-exec_full_load.sql     → Standardlauf: Raw + Cleansed + Mart
-```
+| **Git / GitHub** | Versionierung |
 
 ---
 
@@ -131,24 +179,17 @@ exec_full_load.sql     → Standardlauf: Raw + Cleansed + Mart
 
 | Komponente | Status |
 |---|---|
-| DWH: Raw-Layer | In Entwicklung |
-| DWH: Cleansed-Layer |  In Entwicklung |
-| DWH: Mart-Layer |  Geplant |
-| Power BI Reporting |  Geplant |
+| Schemas & Audit-Tabellen | Abgeschlossen |
+| Orchestrierung (pipeline_config, Agent Job) | Abgeschlossen |
+| RAW-Layer: customers, orders, order_items, order_payments | Abgeschlossen |
+| RAW-Layer: geolocation, order_reviews, products, sellers, translations | In Entwicklung |
+| CLEANSED-Layer: customers, orders, order_items | Abgeschlossen |
+| CLEANSED-Layer: verbleibende 6 Entities | In Entwicklung |
+| MART-Layer | Geplant |
+| Power BI Reporting | Geplant |
 
 ---
 
-**Voraussetzungen:**
-- MS SQL Server (Developer Edition oder höher)
-- SSMS
-- Olist-Datensatz lokal verfügbar ([Kaggle Download](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce))
+## Setup
 
-**Setup:**
-
-1. Schemas anlegen → `sql/create_schemas.sql`
-2. Raw-Tabellen erstellen → `sql/raw/create_raw_tables.sql`
-3. Cleansed-Tabellen erstellen → `sql/cleansed/create_cleansed_tables.sql`
-4. Mart-Tabellen erstellen → `sql/mart/create_mart_tables.sql`
-5. Stored Procedures deployen → alle `sps/` Ordner
-6. Basispfad im Master-Skript anpassen → in `sql/exec_full_load.sql`
-7. Pipeline ausführen → `sql/exec_full_load.sql`
+Siehe [SETUP.md](SETUP.md) für Schritt-für-Schritt-Anleitung zur lokalen Reproduzierbarkeit.
