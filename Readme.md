@@ -2,7 +2,7 @@
 
 End-to-End Data Warehouse auf Basis des öffentlichen [Olist Brazilian E-Commerce Datensatzes](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — rund 100.000 Transaktionen aus dem brasilianischen E-Commerce-Markt.
 
-Ziel des Projekts ist eine produktionsnahe DWH-Pipeline in SQL Server mit Batch-Historisierung, inkrementellem Ladekonzept und vollständigem Audit-Trail. Die Pipeline implementiert gängige Patterns aus der Praxis: Metadata-Driven Orchestrierung über eine zentrale Konfigurationstabelle, Datenqualitätsprüfung, Soft Delete und transaktionssichere Stored Procedures.
+Ziel des Projekts ist der Aufbau eines produktionsnahen Data Warehouse in SQL Server mit Batch-Historisierung, inkrementellem Ladekonzept und vollständigem Audit-Trail. Implementiert werden gängige Patterns aus der Praxis: Metadata-Driven Orchestrierung über eine zentrale Konfigurationstabelle, Datenqualitätsprüfung, Soft Delete und transaktionssichere Stored Procedures.
 
 ---
 
