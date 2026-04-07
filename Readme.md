@@ -39,7 +39,7 @@ CSV-Dateien
 | Schema | Inhalt |
 |---|---|
 | `audit` | `load_log`, `error_log`, `dq_log`, `job_log` — vollständiger Audit-Trail jedes Ladevorgangs |
-| `orchestration` | `pipeline_config` (Metadata Framework), `sp_run_layer`, `sp_run_full_load`, SQL Server Agent Job |
+| `orchestration` | `pipeline_config` (Metadata Framework), `sp_run_layer`, `sp_run_full_load`, `agent_job_full_load` (SQL Server Agent Job) |
 
 ---
 
