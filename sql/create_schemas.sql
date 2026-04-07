@@ -9,3 +9,9 @@ GO
 
 CREATE SCHEMA mart;
 GO
+
+CREATE SCHEMA audit;
+GO
+
+CREATE SCHEMA orchestration;
+GO
