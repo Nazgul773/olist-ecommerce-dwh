@@ -43,21 +43,21 @@ ORDER BY column_name;
 
 
 -- 3. Min/Max Character Length per Column (quotes cleansed)
-SELECT column_name, MIN(length) AS min_length, MAX(length) AS max_length
+SELECT column_name, MIN(length) AS min_length_quotes_cleansed, MAX(length) AS max_length_quotes_cleansed
 FROM (
     SELECT 'order_id'            AS column_name, LEN(TRIM(REPLACE(order_id,   '"', ''))) AS length FROM raw.order_items WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'order_item_id'       AS column_name, LEN(TRIM(order_item_id))                AS length FROM raw.order_items WHERE batch_id = @batch_id
+    SELECT 'order_item_id'       AS column_name, LEN(TRIM(REPLACE(order_item_id,       '"', ''))) AS length FROM raw.order_items WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'product_id'          AS column_name, LEN(TRIM(REPLACE(product_id, '"', ''))) AS length FROM raw.order_items WHERE batch_id = @batch_id
+    SELECT 'product_id'          AS column_name, LEN(TRIM(REPLACE(product_id,          '"', ''))) AS length FROM raw.order_items WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'seller_id'           AS column_name, LEN(TRIM(REPLACE(seller_id,  '"', ''))) AS length FROM raw.order_items WHERE batch_id = @batch_id
+    SELECT 'seller_id'           AS column_name, LEN(TRIM(REPLACE(seller_id,           '"', ''))) AS length FROM raw.order_items WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'shipping_limit_date' AS column_name, LEN(TRIM(shipping_limit_date))          AS length FROM raw.order_items WHERE batch_id = @batch_id
+    SELECT 'shipping_limit_date' AS column_name, LEN(TRIM(REPLACE(shipping_limit_date, '"', ''))) AS length FROM raw.order_items WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'price'               AS column_name, LEN(TRIM(price))                        AS length FROM raw.order_items WHERE batch_id = @batch_id
+    SELECT 'price'               AS column_name, LEN(TRIM(price))                                 AS length FROM raw.order_items WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'freight_value'       AS column_name, LEN(TRIM(freight_value))                AS length FROM raw.order_items WHERE batch_id = @batch_id
+    SELECT 'freight_value'       AS column_name, LEN(TRIM(freight_value))                         AS length FROM raw.order_items WHERE batch_id = @batch_id
 ) AS lengths
 GROUP BY column_name
 ORDER BY column_name;
@@ -104,12 +104,12 @@ WHERE batch_id = @batch_id;
 
 
 -- 8. Duplicate Check (composite key: order_id + order_item_id)
-SELECT order_id, order_item_id, COUNT(*) AS cnt
+SELECT order_id, order_item_id, COUNT(*) AS duplicate_cnt
 FROM raw.order_items
 WHERE batch_id = @batch_id
 GROUP BY order_id, order_item_id
 HAVING COUNT(*) > 1
-ORDER BY cnt DESC;
+ORDER BY duplicate_cnt DESC;
 
 
 -- 9. Items per Order Distribution

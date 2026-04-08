@@ -45,23 +45,23 @@ ORDER BY column_name;
 
 
 -- 3. Min/Max Character Length per Column (quotes cleansed)
-SELECT column_name, MIN(length) AS min_length, MAX(length) AS max_length
+SELECT column_name, MIN(length) AS min_length_quotes_cleansed, MAX(length) AS max_length_quotes_cleansed
 FROM (
     SELECT 'order_id'                      AS column_name, LEN(TRIM(REPLACE(order_id,    '"', ''))) AS length FROM raw.orders WHERE batch_id = @batch_id
     UNION ALL
     SELECT 'customer_id'                   AS column_name, LEN(TRIM(REPLACE(customer_id, '"', ''))) AS length FROM raw.orders WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'order_status'                  AS column_name, LEN(TRIM(order_status))                   AS length FROM raw.orders WHERE batch_id = @batch_id
+    SELECT 'order_status'                  AS column_name, LEN(TRIM(REPLACE(order_status,                  '"', ''))) AS length FROM raw.orders WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'order_purchase_timestamp'      AS column_name, LEN(TRIM(order_purchase_timestamp))       AS length FROM raw.orders WHERE batch_id = @batch_id
+    SELECT 'order_purchase_timestamp'      AS column_name, LEN(TRIM(REPLACE(order_purchase_timestamp,      '"', ''))) AS length FROM raw.orders WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'order_approved_at'             AS column_name, LEN(TRIM(order_approved_at))              AS length FROM raw.orders WHERE batch_id = @batch_id
+    SELECT 'order_approved_at'             AS column_name, LEN(TRIM(REPLACE(order_approved_at,             '"', ''))) AS length FROM raw.orders WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'order_delivered_carrier_date'  AS column_name, LEN(TRIM(order_delivered_carrier_date))   AS length FROM raw.orders WHERE batch_id = @batch_id
+    SELECT 'order_delivered_carrier_date'  AS column_name, LEN(TRIM(REPLACE(order_delivered_carrier_date,  '"', ''))) AS length FROM raw.orders WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'order_delivered_customer_date' AS column_name, LEN(TRIM(order_delivered_customer_date))  AS length FROM raw.orders WHERE batch_id = @batch_id
+    SELECT 'order_delivered_customer_date' AS column_name, LEN(TRIM(REPLACE(order_delivered_customer_date, '"', ''))) AS length FROM raw.orders WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'order_estimated_delivery_date' AS column_name, LEN(TRIM(order_estimated_delivery_date))  AS length FROM raw.orders WHERE batch_id = @batch_id
+    SELECT 'order_estimated_delivery_date' AS column_name, LEN(TRIM(REPLACE(order_estimated_delivery_date, '"', ''))) AS length FROM raw.orders WHERE batch_id = @batch_id
 ) AS lengths
 GROUP BY column_name
 ORDER BY column_name;
@@ -112,7 +112,7 @@ WHERE batch_id = @batch_id;
 
 
 -- 7. Duplicate order_id
-SELECT order_id, COUNT(*) AS cnt
+SELECT order_id, COUNT(*) AS duplicate_cnt
 FROM raw.orders
 WHERE batch_id = @batch_id
 GROUP BY order_id
@@ -232,13 +232,13 @@ SELECT TOP 10
     order_delivered_customer_date,
     DATEDIFF(DAY,
         TRY_CONVERT(DATETIME2(0), TRIM(order_purchase_timestamp), 120),
-        TRY_CONVERT(DATETIME2(0), TRIM(order_delivered_customer_date), 120)) AS delivery_days
+        TRY_CONVERT(DATETIME2(0), TRIM(order_delivered_customer_date), 120)) AS delivery_days_outliers
 FROM raw.orders
 WHERE batch_id = @batch_id
   AND DATEDIFF(DAY,
         TRY_CONVERT(DATETIME2(0), TRIM(order_purchase_timestamp), 120),
         TRY_CONVERT(DATETIME2(0), TRIM(order_delivered_customer_date), 120)) > 60
-ORDER BY delivery_days DESC;
+ORDER BY delivery_days_outliers DESC;
 
 
 -- 15. Orders per Month

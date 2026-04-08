@@ -47,9 +47,9 @@ FROM (
     UNION ALL
     SELECT 'customer_zip_code_prefix' AS column_name, LEN(TRIM(REPLACE(customer_zip_code_prefix, '"', ''))) AS length FROM raw.customers WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'customer_city'            AS column_name, LEN(TRIM(customer_city))                              AS length FROM raw.customers WHERE batch_id = @batch_id
+    SELECT 'customer_city'            AS column_name, LEN(TRIM(REPLACE(customer_city,            '"', ''))) AS length FROM raw.customers WHERE batch_id = @batch_id
     UNION ALL
-    SELECT 'customer_state'           AS column_name, LEN(TRIM(customer_state))                             AS length FROM raw.customers WHERE batch_id = @batch_id
+    SELECT 'customer_state'           AS column_name, LEN(TRIM(REPLACE(customer_state,           '"', ''))) AS length FROM raw.customers WHERE batch_id = @batch_id
 ) AS lengths
 GROUP BY column_name
 ORDER BY column_name;
@@ -71,8 +71,8 @@ SELECT
     SUM(CASE WHEN TRIM(REPLACE(customer_id,              '"', '')) = '' THEN 1 ELSE 0 END) AS empty_customer_id,
     SUM(CASE WHEN TRIM(REPLACE(customer_unique_id,       '"', '')) = '' THEN 1 ELSE 0 END) AS empty_customer_unique_id,
     SUM(CASE WHEN TRIM(REPLACE(customer_zip_code_prefix, '"', '')) = '' THEN 1 ELSE 0 END) AS empty_zip_code_prefix,
-    SUM(CASE WHEN TRIM(customer_city)  = '' THEN 1 ELSE 0 END)                             AS empty_customer_city,
-    SUM(CASE WHEN TRIM(customer_state) = '' THEN 1 ELSE 0 END)                             AS empty_customer_state
+    SUM(CASE WHEN TRIM(REPLACE(customer_city,  '"', '')) = '' THEN 1 ELSE 0 END) AS empty_customer_city,
+    SUM(CASE WHEN TRIM(REPLACE(customer_state, '"', '')) = '' THEN 1 ELSE 0 END) AS empty_customer_state
 FROM raw.customers
 WHERE batch_id = @batch_id;
 
