@@ -4,12 +4,6 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Data
-data/
-*.csv
-*.xlsx
-*.xls
-
 # SQL Server
 *.mdf
 *.ldf
@@ -18,9 +12,7 @@ data/
 # VSC
 .vscode/
 
-# Environment
-.env
+sql/.vs/
 
-# Pipelines
-sql/master_load_raw.sql
-sql/master_load_cleansed.sql
+# Source CSV files
+data/
