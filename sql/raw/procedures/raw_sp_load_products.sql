@@ -76,13 +76,13 @@ BEGIN
             BULK INSERT #products_staging
             FROM ''' + REPLACE(@file_path, '''', '''''') + '''
             WITH (
-                FIRSTROW = 2,
+                FIRSTROW        = 2,
                 FIELDTERMINATOR = '','',
                 ROWTERMINATOR   = ''0x0a'',
                 CODEPAGE        = ''65001''
             );';
 
-        EXEC sp_executesql @sql;
+        EXEC(@sql);
 
         INSERT INTO raw.products (
             batch_id,    product_id,                 product_category_name,

@@ -75,13 +75,13 @@ BEGIN
             BULK INSERT #orders_staging
             FROM ''' + REPLACE(@file_path, '''', '''''') + '''
             WITH (
-                FIRSTROW = 2,
+                FIRSTROW        = 2,
                 FIELDTERMINATOR = '','',
                 ROWTERMINATOR   = ''0x0a'',
                 CODEPAGE        = ''65001''
             );';
 
-        EXEC sp_executesql @sql;
+        EXEC(@sql);
 
         INSERT INTO raw.orders (
             batch_id,    order_id,                      customer_id,
