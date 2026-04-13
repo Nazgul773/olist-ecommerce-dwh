@@ -8,12 +8,12 @@ GO
 --   Set @DatasetRoot below to the folder containing the Olist CSV files.
 --   Trailing backslash required. All RAW file_path values are derived from it.
 
-DECLARE @DatasetRoot NVARCHAR(500) = 'D:\Code\Datasets\olist_data\';
+DECLARE @DatasetRoot NVARCHAR(500) = 'D:\Code\VCS Projects\olist-ecommerce-dwh\data\';
 
 -- RAW Layer
 IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'customers' AND layer = 'RAW')
-    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence)
-    VALUES ('RAW', 'customers', 'raw.sp_load_customers', @DatasetRoot + 'olist_customers_dataset.csv', 'olist_customers_dataset.csv', 1);
+    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence, needs_preprocessing)
+    VALUES ('RAW', 'customers', 'raw.sp_load_customers', @DatasetRoot + 'olist_customers_dataset_pipe.csv', 'olist_customers_dataset_pipe.csv', 1, 1);
 
 IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'orders' AND layer = 'RAW')
     INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence)
@@ -24,24 +24,24 @@ IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'o
     VALUES ('RAW', 'order_items', 'raw.sp_load_order_items', @DatasetRoot + 'olist_order_items_dataset.csv', 'olist_order_items_dataset.csv', 3);
 
 IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'geolocation' AND layer = 'RAW')
-    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence)
-    VALUES ('RAW', 'geolocation', 'raw.sp_load_geolocation', @DatasetRoot + 'olist_geolocation_dataset.csv', 'olist_geolocation_dataset.csv', 4);
+    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence, needs_preprocessing)
+    VALUES ('RAW', 'geolocation', 'raw.sp_load_geolocation', @DatasetRoot + 'olist_geolocation_dataset_pipe.csv', 'olist_geolocation_dataset_pipe.csv', 4, 1);
 
 IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'order_payments' AND layer = 'RAW')
     INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence)
     VALUES ('RAW', 'order_payments', 'raw.sp_load_order_payments', @DatasetRoot + 'olist_order_payments_dataset.csv', 'olist_order_payments_dataset.csv', 5);
 
 IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'order_reviews' AND layer = 'RAW')
-    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence)
-    VALUES ('RAW', 'order_reviews', 'raw.sp_load_order_reviews', @DatasetRoot + 'olist_order_reviews_dataset.csv', 'olist_order_reviews_dataset.csv', 6);
+    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence, needs_preprocessing)
+    VALUES ('RAW', 'order_reviews', 'raw.sp_load_order_reviews', @DatasetRoot + 'olist_order_reviews_dataset_pipe.csv', 'olist_order_reviews_dataset_pipe.csv', 6, 1);
 
 IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'products' AND layer = 'RAW')
     INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence)
     VALUES ('RAW', 'products', 'raw.sp_load_products', @DatasetRoot + 'olist_products_dataset.csv', 'olist_products_dataset.csv', 7);
 
 IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'sellers' AND layer = 'RAW')
-    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence)
-    VALUES ('RAW', 'sellers', 'raw.sp_load_sellers', @DatasetRoot + 'olist_sellers_dataset.csv', 'olist_sellers_dataset.csv', 8);
+    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence, needs_preprocessing)
+    VALUES ('RAW', 'sellers', 'raw.sp_load_sellers', @DatasetRoot + 'olist_sellers_dataset_pipe.csv', 'olist_sellers_dataset_pipe.csv', 8, 1);
 
 IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'product_category_translation' AND layer = 'RAW')
     INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence)
