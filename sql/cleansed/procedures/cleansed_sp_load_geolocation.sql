@@ -14,8 +14,9 @@ BEGIN
     DECLARE @duration_ms    INT;
     DECLARE @error_msg      NVARCHAR(MAX);
 
-    -- Inherit the RAW batch_id so the same ID flows through all layers
-    -- (raw → cleansed → mart), enabling end-to-end tracing.
+    -- Inherit the RAW batch_id so the same ID flows through RAW and CLEANSED,
+    -- enabling layer-to-layer tracing via batch_id. Cross-layer (mart) tracing
+    -- uses job_run_id, which flows through all three layers.
     SELECT @batch_id = src.last_batch_id
     FROM orchestration.pipeline_config cleansed_cfg
     JOIN orchestration.pipeline_config src
