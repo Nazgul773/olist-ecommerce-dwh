@@ -10,7 +10,6 @@ GO
 
 DECLARE @DatasetRoot NVARCHAR(500) = 'D:\Code\VCS Projects\olist-ecommerce-dwh\data\';
 
--- RAW Layer
 IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'customers' AND layer = 'RAW')
     INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence, needs_preprocessing)
     VALUES ('RAW', 'customers', 'raw.sp_load_customers', @DatasetRoot + 'olist_customers_dataset_pipe.csv', 'olist_customers_dataset_pipe.csv', 1, 1);
@@ -47,7 +46,6 @@ IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'p
     INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, file_path, file_name, load_sequence)
     VALUES ('RAW', 'product_category_translation', 'raw.sp_load_product_category_name_translation', @DatasetRoot + 'product_category_name_translation.csv', 'product_category_name_translation.csv', 9);
 
--- CLEANSED Layer
 -- source_pipeline_id resolved via subquery — avoids hardcoding IDENTITY values.
 IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'customers' AND layer = 'CLEANSED')
     INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, load_sequence, source_pipeline_id)
@@ -94,8 +92,36 @@ IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'p
     SELECT 'CLEANSED', 'product_category_translation', 'cleansed.sp_load_product_category_name_translation', 9,
            pipeline_id FROM orchestration.pipeline_config WHERE table_name = 'product_category_translation' AND layer = 'RAW';
 
--- MART Layer
+-- MART Layer — dimensions first (1–6), facts after (7–8)
+IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'dim_date' AND layer = 'MART')
+    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, load_sequence)
+    VALUES ('MART', 'dim_date', 'mart.sp_load_dim_date', 1);
+
+IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'dim_customer' AND layer = 'MART')
+    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, load_sequence)
+    VALUES ('MART', 'dim_customer', 'mart.sp_load_dim_customer', 2);
+
+IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'dim_seller' AND layer = 'MART')
+    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, load_sequence)
+    VALUES ('MART', 'dim_seller', 'mart.sp_load_dim_seller', 3);
+
+IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'dim_product' AND layer = 'MART')
+    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, load_sequence)
+    VALUES ('MART', 'dim_product', 'mart.sp_load_dim_product', 4);
+
+IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'dim_payment_type' AND layer = 'MART')
+    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, load_sequence)
+    VALUES ('MART', 'dim_payment_type', 'mart.sp_load_dim_payment_type', 5);
+
+IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'dim_order_status' AND layer = 'MART')
+    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, load_sequence)
+    VALUES ('MART', 'dim_order_status', 'mart.sp_load_dim_order_status', 6);
+
 IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'fact_sales' AND layer = 'MART')
     INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, load_sequence)
-    VALUES ('MART', 'fact_sales', 'mart.sp_load_fact_sales', 1);
+    VALUES ('MART', 'fact_sales', 'mart.sp_load_fact_sales', 7);
+
+IF NOT EXISTS (SELECT 1 FROM orchestration.pipeline_config WHERE table_name = 'fact_payments' AND layer = 'MART')
+    INSERT INTO orchestration.pipeline_config (layer, table_name, sp_name, load_sequence)
+    VALUES ('MART', 'fact_payments', 'mart.sp_load_fact_payments', 8);
 GO

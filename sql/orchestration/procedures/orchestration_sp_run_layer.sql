@@ -17,7 +17,7 @@ BEGIN
     DECLARE @error_msg        NVARCHAR(MAX);
     DECLARE @layer_failed     BIT          = 0;
     DECLARE @first_error      NVARCHAR(MAX);
-    DECLARE @child_sp_invoked BIT          = 0; -- set to 1 immediately before child SP call
+    DECLARE @child_sp_invoked BIT          = 0;
 
     DECLARE etl_cursor CURSOR FOR
         SELECT pipeline_id, sp_name, file_path, file_name
@@ -67,9 +67,9 @@ BEGIN
                     @pid = @pipeline_id,
                     @jid = @job_run_id;
             END
-            ELSE
+            ELSE IF @layer = 'CLEANSED'
             BEGIN
-                -- CLEANSED / MART: no file parameters
+                -- CLEANSED: inherits RAW batch_id via source_pipeline_id
                 SET @sql = 'EXEC '
                     + QUOTENAME(PARSENAME(@sp_name, 2)) + '.' + QUOTENAME(PARSENAME(@sp_name, 1))
                     + ' @batch_id    = @bid OUTPUT,'
@@ -80,6 +80,19 @@ BEGIN
                 EXEC sp_executesql @sql,
                     N'@bid UNIQUEIDENTIFIER OUTPUT, @pid INT, @jid UNIQUEIDENTIFIER',
                     @bid = @batch_id OUTPUT,
+                    @pid = @pipeline_id,
+                    @jid = @job_run_id;
+            END
+            ELSE -- MART: no batch_id; cross-layer tracing via job_run_id
+            BEGIN
+                SET @sql = 'EXEC '
+                    + QUOTENAME(PARSENAME(@sp_name, 2)) + '.' + QUOTENAME(PARSENAME(@sp_name, 1))
+                    + ' @pipeline_id = @pid,'
+                    + ' @job_run_id  = @jid';
+
+                SET @child_sp_invoked = 1;
+                EXEC sp_executesql @sql,
+                    N'@pid INT, @jid UNIQUEIDENTIFIER',
                     @pid = @pipeline_id,
                     @jid = @job_run_id;
             END

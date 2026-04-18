@@ -1,7 +1,6 @@
 USE OlistDWH;
 GO
 
--- Trigger: auto-update modified_ts on any UPDATE to pipeline_config
 CREATE OR ALTER TRIGGER orchestration.trg_pipeline_config_modified
 ON orchestration.pipeline_config
 AFTER UPDATE

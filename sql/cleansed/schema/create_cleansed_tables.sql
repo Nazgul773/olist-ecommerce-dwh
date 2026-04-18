@@ -1,8 +1,6 @@
 USE OlistDWH;
 GO
 
--- DDL: cleansed schema tables
-
 CREATE TABLE cleansed.customers (
     customer_id              NVARCHAR(32)  NOT NULL,
     customer_unique_id       NVARCHAR(32)  NOT NULL,

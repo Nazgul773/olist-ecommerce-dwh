@@ -186,7 +186,7 @@ BEGIN
               AND clean_customer_state IS NOT NULL           AND clean_customer_state != '' AND clean_customer_state NOT LIKE '%[^A-Z]%'           AND LEN(clean_customer_state) = 2
         ) AS src
         ON tgt.customer_id = src.clean_customer_id
-        -- Data changed (according to row_hash) or row is reactivating after a soft delete
+        -- Data changed (according to row_hash) or row is reactivating after a soft delete.
         WHEN MATCHED AND (tgt.row_hash <> src.row_hash OR tgt.is_deleted = 1) THEN
             UPDATE SET
                 customer_unique_id       = src.clean_customer_unique_id,
@@ -197,7 +197,6 @@ BEGIN
                 is_deleted               = 0,
                 deleted_at               = NULL,
                 updated_at               = SYSUTCDATETIME()
-        -- New row in current batch (source) that doesn't exist in cleansed (target)
         WHEN NOT MATCHED BY TARGET THEN
             INSERT (
                 customer_id,              customer_unique_id,
@@ -209,8 +208,7 @@ BEGIN
                 src.clean_customer_zip_code_prefix, src.clean_customer_city,
                 src.clean_customer_state,           src.row_hash, SYSUTCDATETIME()
             )
-        -- Row exists in cleansed (target) but not in current batch (source) — source no longer contains it
-        -- Soft delete by marking is_deleted = 1 and setting deleted_at for historical tracking, instead of hard deleting.
+        -- Soft delete: is_deleted = 1 + deleted_at, not a hard delete.
         WHEN NOT MATCHED BY SOURCE AND tgt.is_deleted = 0 THEN
             UPDATE SET
                 is_deleted = 1,

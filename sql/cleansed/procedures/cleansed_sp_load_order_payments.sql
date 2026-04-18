@@ -212,7 +212,6 @@ BEGIN
                 is_deleted           = 0,
                 deleted_at           = NULL,
                 updated_at           = SYSUTCDATETIME()
-        -- New row in current batch (source) that doesn't exist in cleansed (target)
         WHEN NOT MATCHED BY TARGET THEN
             INSERT (
                 order_id,            payment_sequential,
@@ -224,8 +223,7 @@ BEGIN
                 src.clean_payment_type, src.parsed_installments,
                 src.parsed_value,    src.row_hash,          SYSUTCDATETIME()
             )
-        -- Row exists in cleansed (target) but not in current batch (source) — source no longer contains it
-        -- Soft delete by marking is_deleted = 1 and setting deleted_at for historical tracking, instead of hard deleting.
+        -- Soft delete: is_deleted = 1 + deleted_at, not a hard delete.
         WHEN NOT MATCHED BY SOURCE AND tgt.is_deleted = 0 THEN
             UPDATE SET
                 is_deleted = 1,

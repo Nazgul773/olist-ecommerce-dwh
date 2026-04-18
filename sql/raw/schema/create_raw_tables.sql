@@ -1,8 +1,6 @@
 USE OlistDWH;
 GO
 
--- DDL: raw schema tables
-
 CREATE TABLE raw.[customers] (
     [row_id]                    INT IDENTITY(1,1)   NOT NULL,
     [batch_id]                  UNIQUEIDENTIFIER    NOT NULL,

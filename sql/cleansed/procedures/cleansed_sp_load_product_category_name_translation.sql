@@ -155,8 +155,7 @@ BEGIN
                 is_deleted                    = 0,
                 deleted_at                    = NULL,
                 updated_at                    = SYSUTCDATETIME()
-        -- Row exists in cleansed (target) but not in current batch (source) — source no longer contains it
-        -- Soft delete by marking is_deleted = 1 and setting deleted_at for historical tracking, instead of hard deleting.
+        -- Soft delete: is_deleted = 1 + deleted_at, not a hard delete.
         WHEN NOT MATCHED BY TARGET THEN
             INSERT (
                 product_category_name, product_category_name_english,

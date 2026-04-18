@@ -15,7 +15,7 @@ CSV-Dateien
 ┌────────────────────────────────────────────────────────────────────┐
 │  PREPROCESSING                                                     │
 │  preprocess_all.ps1  (needs_preprocessing = 1)                     │
-│  Konvertierung: comma-delimited → pipe-delimited                   │
+│  Konvertierung: comma-delimited -> pipe-delimited                  │
 └────────────────────────────────────────────────────────────────────┘
     │
     ▼
@@ -36,16 +36,16 @@ CSV-Dateien
     ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │  MART                                                           │
-│  Star-Schema · Fakten- und Dimensionstabellen                   │
-│  (in Entwicklung)                                               │
+│  Star-Schema · 6 Dimensionen · 2 Faktentabellen                 │
+│  Dims: SCD Type 1 MERGE · Facts: Full-Reload (TRUNCATE+INSERT)  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Querschnittsschemas
 
-| Schema | Inhalt |
-|---|---|
-| `audit` | `load_log`, `error_log`, `dq_log`, `job_log` — vollständiger Audit-Trail jedes Ladevorgangs |
+| Schema          | Inhalt                                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `audit`         | `load_log`, `error_log`, `dq_log`, `job_log` — vollständiger Audit-Trail jedes Ladevorgangs                              |
 | `orchestration` | `pipeline_config` (Metadata Framework), `sp_run_layer`, `sp_run_full_load`, `agent_job_full_load` (SQL Server Agent Job) |
 
 ---
@@ -54,7 +54,7 @@ CSV-Dateien
 
 ### Preprocessing — CSV-Konvertierung
 
-Einige Quelldateien enthalten in Feldern eingebettete Kommas oder Zeilenumbrüche (z.B. Geodaten, Bewertungstexte), die `BULK INSERT` auf SQL Server on-premises nicht korrekt verarbeiten kann (`IID_IColumnsInfo` OLE DB-Einschränkung). Für diese Dateien führt `preprocess_all.ps1` vor dem RAW-Load eine Konvertierung durch: comma-delimited mit gequoteten Feldern → pipe-delimited ohne Quoting.
+Einige Quelldateien enthalten in Feldern eingebettete Kommas oder Zeilenumbrüche (z.B. Geodaten, Bewertungstexte), die `BULK INSERT` auf SQL Server on-premises nicht korrekt verarbeiten kann (`IID_IColumnsInfo` OLE DB-Einschränkung). Für diese Dateien führt `preprocess_all.ps1` vor dem RAW-Load eine Konvertierung durch: comma-delimited mit gequoteten Feldern -> pipe-delimited ohne Quoting.
 
 Welche Pipelines vorverarbeitet werden, steuert die Spalte `needs_preprocessing = 1` in `orchestration.pipeline_config`. Das Preprocessing wird nur ausgeführt, wenn die Quelldatei seit dem letzten erfolgreichen RAW-Load geändert wurde (`LastWriteTimeUtc > last_success_ts` aus `audit.load_log`). Unveränderte Dateien werden übersprungen. Die Ausgabedateien werden bei jedem Lauf überschrieben — es findet keine Akkumulation statt.
 
@@ -76,11 +76,11 @@ Zeilen, die im aktuellen Batch nicht mehr vorkommen, werden **soft-deleted** (`i
 
 Vor jedem MERGE läuft eine CTE-basierte DQ-Prüfung über drei Dimensionen:
 
-| Dimension | Prüfungen |
-|---|---|
-| **Completeness** | NULL-Werte, leere Strings nach Bereinigung |
-| **Validity** | Länge, Format (Hex-IDs, numerische Felder, Datumsformat), Wertemenge (z.B. `payment_type`), logische Konsistenz (z.B. Lieferdatum vor Kaufdatum) |
-| **Uniqueness** | Duplikate des Primärschlüssels innerhalb eines Batches |
+| Dimension        | Prüfungen                                                                                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Completeness** | NULL-Werte, leere Strings nach Bereinigung                                                                                                       |
+| **Validity**     | Länge, Format (Hex-IDs, numerische Felder, Datumsformat), Wertemenge (z.B. `payment_type`), logische Konsistenz (z.B. Lieferdatum vor Kaufdatum) |
+| **Uniqueness**   | Duplikate des Primärschlüssels innerhalb eines Batches                                                                                           |
 
 Ergebnisse werden aggregiert in `audit.dq_log` geschrieben — eine Zeile pro `(column_name, issue)`-Kategorie mit `affected_row_count`. Bei strukturellen Duplikaten (eindeutiger PK verletzt) wird der MERGE mit einem expliziten `THROW` abgebrochen. Bekannte Quelldaten-Duplikate (z.B. `review_id`) werden geloggt und durch `ROW_NUMBER()` dedupliziert, lösen aber keinen Abbruch aus.
 
@@ -94,13 +94,13 @@ Der Kern der Orchestrierung ist die Tabelle `orchestration.pipeline_config` — 
 
 ```
 pipeline_config
-├── sp_name               → welche SP wird aufgerufen
-├── source_pipeline_id    → FK auf die upstream RAW-Pipeline
-├── file_path / file_name → Quelldatei
-├── needs_preprocessing   → ob preprocess_all.ps1 die Datei vorverarbeiten soll
-├── load_sequence         → Ausführungsreihenfolge innerhalb eines Layers
-├── is_active             → Pipeline ein-/ausschaltbar
-└── last_run_status / last_batch_id → Laufzeitstatus, wird nach jedem Load aktualisiert
+├── sp_name               -> welche SP wird aufgerufen
+├── source_pipeline_id    -> FK auf die upstream RAW-Pipeline
+├── file_path / file_name -> Quelldatei
+├── needs_preprocessing   -> ob preprocess_all.ps1 die Datei vorverarbeiten soll
+├── load_sequence         -> Ausführungsreihenfolge innerhalb eines Layers
+├── is_active             -> Pipeline ein-/ausschaltbar
+└── last_run_status / last_batch_id -> Laufzeitstatus, wird nach jedem Load aktualisiert
 ```
 
 Die Orchestrierungs-SPs lesen ausschließlich aus dieser Tabelle — neue Entities erfordern nur einen neuen `pipeline_config`-Eintrag, keine Änderung an der Orchestrierungslogik.
@@ -118,17 +118,17 @@ Der SQL Server Agent Job (`agent_job_full_load.sql`) enthält zwei Steps: Prepro
 
 **Quelle:** [Olist Brazilian E-Commerce – Kaggle](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
 
-| Datei | Inhalt |
-|---|---|
-| `olist_customers_dataset.csv` | Kundenstammdaten |
-| `olist_orders_dataset.csv` | Bestellkopfdaten |
-| `olist_order_items_dataset.csv` | Bestellpositionen |
-| `olist_order_payments_dataset.csv` | Zahlungsinformationen |
-| `olist_order_reviews_dataset.csv` | Kundenbewertungen |
-| `olist_products_dataset.csv` | Produktstammdaten |
-| `olist_sellers_dataset.csv` | Verkäuferstammdaten |
-| `olist_geolocation_dataset.csv` | PLZ-Geodaten |
-| `product_category_name_translation.csv` | Kategorie-Übersetzungen (PT → EN) |
+| Datei                                   | Inhalt                             |
+| --------------------------------------- | ---------------------------------- |
+| `olist_customers_dataset.csv`           | Kundenstammdaten                   |
+| `olist_orders_dataset.csv`              | Bestellkopfdaten                   |
+| `olist_order_items_dataset.csv`         | Bestellpositionen                  |
+| `olist_order_payments_dataset.csv`      | Zahlungsinformationen              |
+| `olist_order_reviews_dataset.csv`       | Kundenbewertungen                  |
+| `olist_products_dataset.csv`            | Produktstammdaten                  |
+| `olist_sellers_dataset.csv`             | Verkäuferstammdaten                |
+| `olist_geolocation_dataset.csv`         | PLZ-Geodaten                       |
+| `product_category_name_translation.csv` | Kategorie-Übersetzungen (PT -> EN) |
 
 ---
 
@@ -167,9 +167,13 @@ olist-ecommerce-dwh/
 │   │       ├── cleansed_sp_load_customers.sql
 │   │       ├── cleansed_sp_load_orders.sql
 │   │       └── ...
-│   ├── mart/    # in Entwicklung
-│   │   └── schema/
-│   │       └── create_mart_tables.sql
+│   ├── mart/
+│   │   ├── schema/
+│   │   │   └── create_mart_tables.sql
+│   │   └── procedures/
+│   │       ├── mart_sp_load_fact_sales.sql
+│   │       ├── mart_sp_load_fact_payments.sql
+│   │       └── ...
 │   ├── orchestration/
 │   │   ├── schema/
 │   │   │   ├── create_orchestration_tables.sql
@@ -191,27 +195,27 @@ olist-ecommerce-dwh/
 
 ## Technologien
 
-| Tool | Verwendung |
-|---|---|
-| **MS SQL Server** | Datenbank, gesamte Pipeline-Logik |
-| **SSMS** | Entwicklung, Testing, lokale Ausführung |
-| **SQL Server Agent** | Job-Scheduling (produktive Ausführung) |
-| **PowerShell** | CSV-Vorverarbeitung  |
-| **Python** | DDL-Generierung |
-| **Git / GitHub** | Versionierung |
+| Tool                 | Verwendung                              |
+| -------------------- | --------------------------------------- |
+| **MS SQL Server**    | Datenbank, gesamte Pipeline-Logik       |
+| **SSMS**             | Entwicklung, Testing, lokale Ausführung |
+| **SQL Server Agent** | Job-Scheduling (produktive Ausführung)  |
+| **PowerShell**       | CSV-Vorverarbeitung                     |
+| **Python**           | DDL-Generierung                         |
+| **Git / GitHub**     | Versionierung                           |
 
 ---
 
 ## Status
 
-| Komponente | Status |
-|---|---|
-| Schemas & Audit-Tabellen | Abgeschlossen |
-| Orchestrierung (pipeline_config, Agent Job) | Abgeschlossen |
-| RAW-Layer: Stored Procedures und EDAs (alle 9 Entitäten) | Abgeschlossen |
-| CLEANSED-Layer: alle 9 Entitäten | Abgeschlossen |
-| MART-Layer | In Entwicklung |
-| Power BI Reporting | Geplant |
+| Komponente                                               | Status         |
+| -------------------------------------------------------- | -------------- |
+| Schemas & Audit-Tabellen                                 | Abgeschlossen  |
+| Orchestrierung (pipeline_config, Agent Job)              | Abgeschlossen  |
+| RAW-Layer: Stored Procedures und EDAs (alle 9 Entitäten) | Abgeschlossen  |
+| CLEANSED-Layer: alle 9 Entitäten                         | Abgeschlossen  |
+| MART-Layer: 6 Dimensionen, 2 Faktentabellen              | Abgeschlossen  |
+| Power BI Reporting                                       | In Entwicklung        |
 
 ---
 

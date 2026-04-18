@@ -1,8 +1,6 @@
 USE OlistDWH;
 GO
 
--- DDL: audit schema tables
-
 -- Job Log table (referenced by FK in other tables)
 CREATE TABLE audit.job_log (
     job_log_id       INT IDENTITY(1,1)  NOT NULL,
@@ -24,7 +22,7 @@ GO
 
 CREATE TABLE audit.load_log (
     log_id                INT IDENTITY(1,1)  NOT NULL,
-    batch_id              UNIQUEIDENTIFIER   NOT NULL,
+    batch_id              UNIQUEIDENTIFIER   NULL,
     job_run_id            UNIQUEIDENTIFIER   NULL
                               CONSTRAINT fk_load_log_job
                               REFERENCES audit.job_log(job_run_id),

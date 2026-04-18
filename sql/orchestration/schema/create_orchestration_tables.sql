@@ -1,8 +1,5 @@
 USE OlistDWH;
 GO
--- DDL: orchestration schema tables
-
--- ETL control table
 CREATE TABLE orchestration.pipeline_config (
     pipeline_id        INT IDENTITY(1,1)  PRIMARY KEY,
     layer              NVARCHAR(20)     NOT NULL,
