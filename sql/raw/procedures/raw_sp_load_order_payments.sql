@@ -80,6 +80,9 @@ BEGIN
 
         EXEC (@sql);
 
+        IF (SELECT COUNT(*) FROM #order_payments_staging) = 0
+            THROW 50002, 'BULK INSERT loaded 0 rows — verify file_path, delimiter, and encoding.', 1;
+
         INSERT INTO raw.order_payments (
             batch_id,    order_id,    payment_sequential,  payment_type,
             payment_installments,     payment_value,        load_ts,   file_name

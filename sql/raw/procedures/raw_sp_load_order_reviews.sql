@@ -14,7 +14,7 @@ BEGIN
     DECLARE @rows        INT           = 0;
     DECLARE @error_msg   NVARCHAR(MAX);
     DECLARE @sql         NVARCHAR(MAX);
-    DECLARE @start_time  DATETIME2     = SYSUTCDATETIME();
+    DECLARE @start_time  DATETIME2(3)  = SYSUTCDATETIME();
     DECLARE @duration_ms INT;
 
     -- Validate required parameters before assigning a batch_id or writing a RUNNING entry,
@@ -84,6 +84,9 @@ BEGIN
             );';
 
         EXEC(@sql);
+
+        IF (SELECT COUNT(*) FROM #order_reviews_staging) = 0
+            THROW 50002, 'BULK INSERT loaded 0 rows — verify file_path, delimiter, and encoding.', 1;
 
         INSERT INTO raw.order_reviews (
             batch_id,     review_id,             order_id,

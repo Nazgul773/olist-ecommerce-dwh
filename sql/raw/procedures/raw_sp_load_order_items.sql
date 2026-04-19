@@ -82,6 +82,9 @@ BEGIN
 
         EXEC (@sql);
 
+        IF (SELECT COUNT(*) FROM #order_items_staging) = 0
+            THROW 50002, 'BULK INSERT loaded 0 rows — verify file_path, delimiter, and encoding.', 1;
+
         INSERT INTO raw.order_items (
             batch_id,    order_id,     order_item_id,  product_id,
             seller_id,   shipping_limit_date,          price,
