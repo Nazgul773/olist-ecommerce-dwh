@@ -143,10 +143,8 @@ olist-ecommerce-dwh/
 │       ├── eda_orders.sql
 │       └── ...
 ├── scripts/
-│   ├── ps/
-│   │   └── preprocess_all.ps1
-│   └── python/
-│       └── generate_create_tables.py
+│   └── ps/
+│       └── preprocess_all.ps1
 ├── sql/
 │   ├── setup/
 │   │   └── create_schemas.sql
