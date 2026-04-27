@@ -31,7 +31,7 @@ Welche Pipelines vorverarbeitet werden, steuert die Spalte `needs_preprocessing 
 
 Jeder Load erhält eine eindeutige `batch_id` (GUID), die allen Zeilen des Batches zugewiesen wird. Die raw-Tabellen wachsen mit jedem Load — Historisierung auf Batch-Ebene ist damit vollständig gewährleistet. Non-Clustered Indexes auf `batch_id` stellen sicher, dass der `WHERE batch_id = @batch_id`-Filter in den CLEANSED-SPs als Index Seek ausgeführt wird.
 
-### Cleansed — Inkrementelles Ladekonzept
+### Cleansed — Inkrementelles Ladekonzept mit DQ-Checks
 
 Der CLEANSED-Layer liest aus RAW über die `batch_id` des letzten erfolgreichen RAW-Loads. Das MERGE-Statement erkennt Änderungen über einen SHA2-256-Hash aller fachlichen Spalten:
 
@@ -41,9 +41,30 @@ HASHBYTES('SHA2_256', CONCAT(col1, '|', col2, '|', ...)) AS row_hash
 
 Zeilen, die im aktuellen Batch nicht mehr vorkommen, werden **soft-deleted** (`is_deleted = 1`, `deleted_at`) statt physisch gelöscht — der Audit-Trail und Mart-FK-Referenzen bleiben intakt. Wiederauftauchende Datensätze werden automatisch reaktiviert.
 
+### Mart — Star-Schema mit Full-Reload und SCD Type 1
+
+Der MART-Layer implementiert ein Kimball-Stern-Schema mit 6 Dimensionen und 2 Faktentabellen.
+
+**Dimensionen** werden über SCD Type 1 MERGE geladen — Änderungen überschreiben den bestehenden Wert, keine Historisierung:
+
+| Dimension             | Typ                  | Besonderheit                                             |
+| --------------------- | -------------------- | -------------------------------------------------------- |
+| `dim_customer`        | MERGE (SCD Type 1)   | Natural Key: `customer_id`                              |
+| `dim_seller`          | MERGE (SCD Type 1)   | Natural Key: `seller_id`                                |
+| `dim_product`         | MERGE (SCD Type 1)   | Natural Key: `product_id`                               |
+| `dim_date`            | INSERT (WHERE NOT EXISTS) | Tally-CTE, einmalig für 2016–2025 befüllt          |
+| `dim_payment_type`    | INSERT (WHERE NOT EXISTS) | Fixer Wertevorrat (5 Typen), idempotent geseedet   |
+| `dim_order_status`    | INSERT (WHERE NOT EXISTS) | Fixer Wertevorrat (8 Status), idempotent geseedet  |
+
+**Faktentabellen** werden bei jedem Lauf vollständig neu geladen (TRUNCATE + INSERT) — die Quelldaten sind unveränderlich (abgeschlossene Orders), ein inkrementelles Ladekonzept wäre Overhead ohne Mehrwert.
+
+Für nicht auflösbare FK-Referenzen greifen Sentinel-Werte: `-1` (Unknown Member) für Dimensionsschlüssel, `0` für Datumsschlüssel. Non-Clustered Columnstore Indexes auf beiden Faktentabellen optimieren analytische Abfragen.
+
+Die Mart-SPs erhalten keine `batch_id` — die Rückverfolgbarkeit über Layer-Grenzen erfolgt ausschließlich über `job_run_id`.
+
 ### Datenqualitätsprüfung
 
-Vor jedem MERGE läuft eine CTE-basierte DQ-Prüfung über drei Dimensionen:
+Vor jedem MERGE im Cleansed-Layer läuft eine CTE-basierte DQ-Prüfung über drei Dimensionen:
 
 | Dimension        | Prüfungen                                                                                                                                        |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
