@@ -17,6 +17,111 @@ Ziel des Projekts ist der Aufbau eines produktionsnahen Data Warehouse in SQL Se
 | `audit`         | `load_log`, `error_log`, `dq_log`, `job_log` — vollständiger Audit-Trail jedes Ladevorgangs                              |
 | `orchestration` | `pipeline_config` (Metadata Framework), `sp_run_layer`, `sp_run_full_load`, `agent_job_full_load` (SQL Server Agent Job) |
 
+### Mart — Stern-Schema (ERD)
+
+```mermaid
+erDiagram
+    dim_date {
+        int date_key PK
+        date full_date
+        smallint year
+        smallint iso_year
+        tinyint quarter
+        tinyint month
+        nvarchar month_name
+        tinyint week_of_year
+        tinyint day_of_month
+        tinyint day_of_week
+        nvarchar day_name
+        bit is_weekend
+    }
+    dim_customer {
+        int customer_key PK
+        nvarchar customer_id
+        nvarchar customer_unique_id
+        char customer_zip_code
+        nvarchar customer_city
+        char customer_state
+        decimal customer_lat
+        decimal customer_lng
+    }
+    dim_seller {
+        int seller_key PK
+        nvarchar seller_id
+        char seller_zip_code
+        nvarchar seller_city
+        char seller_state
+        decimal seller_lat
+        decimal seller_lng
+    }
+    dim_product {
+        int product_key PK
+        nvarchar product_id
+        nvarchar product_category_name
+        nvarchar product_category_name_english
+        int product_name_length
+        int product_description_length
+        int product_photos_qty
+        int product_weight_g
+        int product_length_cm
+        int product_height_cm
+        int product_width_cm
+    }
+    dim_order_status {
+        int order_status_key PK
+        nvarchar status_name
+        nvarchar status_category
+        tinyint sort_order
+    }
+    dim_payment_type {
+        int payment_type_key PK
+        nvarchar payment_type_name
+    }
+    fact_sales {
+        bigint sales_key PK
+        int purchase_date_key FK
+        int estimated_delivery_date_key FK
+        int carrier_handoff_date_key FK
+        int actual_delivery_date_key FK
+        int customer_key FK
+        int seller_key FK
+        int product_key FK
+        int order_status_key FK
+        nvarchar order_id
+        int order_item_id
+        decimal price
+        decimal freight_value
+        decimal total_value
+        int purchase_to_delivery_days
+        int delivery_vs_estimate_days
+        int purchase_to_approval_hours
+        int carrier_to_delivery_days
+        tinyint review_score
+    }
+    fact_payments {
+        bigint payment_fact_key PK
+        int purchase_date_key FK
+        int customer_key FK
+        int payment_type_key FK
+        nvarchar order_id
+        int payment_sequential
+        int payment_installments
+        decimal payment_value
+    }
+
+    dim_date         ||--o{ fact_sales     : "purchase_date_key"
+    dim_date         ||--o{ fact_sales     : "estimated_delivery_date_key"
+    dim_date         ||--o{ fact_sales     : "carrier_handoff_date_key"
+    dim_date         ||--o{ fact_sales     : "actual_delivery_date_key"
+    dim_customer     ||--o{ fact_sales     : "customer_key"
+    dim_seller       ||--o{ fact_sales     : "seller_key"
+    dim_product      ||--o{ fact_sales     : "product_key"
+    dim_order_status ||--o{ fact_sales     : "order_status_key"
+    dim_date         ||--o{ fact_payments  : "purchase_date_key"
+    dim_customer     ||--o{ fact_payments  : "customer_key"
+    dim_payment_type ||--o{ fact_payments  : "payment_type_key"
+```
+
 ---
 
 ## Pipeline-Design
