@@ -8,38 +8,7 @@ Ziel des Projekts ist der Aufbau eines produktionsnahen Data Warehouse in SQL Se
 
 ## Architektur
 
-```
-CSV-Dateien
-    │
-    ▼
-┌────────────────────────────────────────────────────────────────────┐
-│  PREPROCESSING                                                     │
-│  preprocess_all.ps1  (needs_preprocessing = 1)                     │
-│  Konvertierung: comma-delimited -> pipe-delimited                  │
-└────────────────────────────────────────────────────────────────────┘
-    │
-    ▼
-┌────────────────────────────────────────────────────────────────────┐
-│  RAW                                                               │
-│  Append-Only Staging · Batch-Historisierung · keine Transformation │
-│  Metafelder: batch_id, load_ts, file_name                          │
-└────────────────────────────────────────────────────────────────────┘
-    │  batch_id wird an CLEANSED weitergegeben
-    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  CLEANSED                                                       │
-│  Inkrementelles Ladekonzept via MERGE · SHA2-256 Row-Hash       │
-│  DQ-Checks (Completeness, Validity, Uniqueness)                 │
-│  Soft Delete für quellengetreue Historisierung                  │
-└─────────────────────────────────────────────────────────────────┘
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  MART                                                           │
-│  Star-Schema · 6 Dimensionen · 2 Faktentabellen                 │
-│  Dims: SCD Type 1 MERGE · Facts: Full-Reload (TRUNCATE+INSERT)  │
-└─────────────────────────────────────────────────────────────────┘
-```
+<img width="1472" height="1308" alt="image" src="https://github.com/user-attachments/assets/363b4a7d-fc2c-4263-92c4-87ac6c829ad0" />
 
 ### Querschnittsschemas
 
