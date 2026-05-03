@@ -5,7 +5,7 @@ GO
 -- Description: Extend V005 — update pipeline_config file paths for sellers and
 --              customers to point to pipe-delimited files. These files handle quoted CSV
 --              fields containing commas and embedded newlines.
--- Applied: manually in SSMS — run after raw SP redeployments for sellers and customers.
+-- Applied: manually in SSMS
 
 DECLARE @DatasetRoot NVARCHAR(500);
 SELECT @DatasetRoot = LEFT(file_path, LEN(file_path) - LEN(file_name))

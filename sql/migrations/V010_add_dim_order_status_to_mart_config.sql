@@ -2,9 +2,10 @@ USE OlistDWH;
 GO
 
 -- Migration V010: Add dim_order_status pipeline to MART layer config.
--- dim_order_status is a static lookup seeded by mart.sp_load_dim_order_status.
--- Inserted at load_sequence = 6 (before fact_sales) — fact_sales depends on it
--- for order_status_key resolution. fact_sales and fact_payments are shifted to 7 and 8.
+-- Description: dim_order_status is a static lookup seeded by mart.sp_load_dim_order_status.
+--              Inserted at load_sequence = 6 (before fact_sales) — fact_sales depends on it
+--              for order_status_key resolution. fact_sales and fact_payments are shifted to 7 and 8.
+-- Applied: manually in SSMS
 
 UPDATE orchestration.pipeline_config
 SET load_sequence = 7

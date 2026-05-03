@@ -8,6 +8,8 @@ GO
 --              Run this AFTER deploying all mart schema DDL and mart SPs.
 
 -- Correct the existing fact_sales entry: sequence 1 -> 6 (dims run first)
+-- Applied: manually in SSMS
+
 UPDATE orchestration.pipeline_config
 SET load_sequence = 6
 WHERE table_name = 'fact_sales' AND layer = 'MART';
