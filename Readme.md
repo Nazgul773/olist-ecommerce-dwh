@@ -8,7 +8,7 @@ Ziel des Projekts ist der Aufbau eines produktionsnahen Data Warehouse in SQL Se
 
 ## Architektur
 
-<img alt="DWH Architecture" src="docs\images\architecture\dwh_architecture.svg" />
+<img alt="DWH Architecture" src="docs/images/architecture/dwh_architecture.svg" />
 
 ### Querschnittsschemas
 
@@ -133,7 +133,7 @@ erDiagram
 
 ### Page 1 — Executive Overview
 
-![Executive Overview](docs\images\dashboard\page1_executive_overview.png)
+![Executive Overview](docs/images/dashboard/page1_executive_overview.png)
 
 DAX Measures: [`powerbi/te_create_measures.csx`](powerbi/te_create_measures.csx)
 
