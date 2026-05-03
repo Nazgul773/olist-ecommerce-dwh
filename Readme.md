@@ -8,7 +8,7 @@ Ziel des Projekts ist der Aufbau eines produktionsnahen Data Warehouse in SQL Se
 
 ## Architektur
 
-<img alt="DWH Architecture" src="docs/images/dwh_architecture_olist.svg" />
+<img alt="DWH Architecture" src="docs\images\architecture\dwh_architecture.svg" />
 
 ### Querschnittsschemas
 
@@ -29,6 +29,9 @@ erDiagram
         tinyint quarter
         tinyint month
         nvarchar month_name
+        int year_month_key
+        nvarchar year_month
+        nvarchar month_year_short
         tinyint week_of_year
         tinyint day_of_month
         tinyint day_of_week
@@ -42,6 +45,7 @@ erDiagram
         char customer_zip_code
         nvarchar customer_city
         char customer_state
+        nvarchar customer_state_name
         decimal customer_lat
         decimal customer_lng
     }
@@ -51,6 +55,7 @@ erDiagram
         char seller_zip_code
         nvarchar seller_city
         char seller_state
+        nvarchar seller_state_name
         decimal seller_lat
         decimal seller_lng
     }
@@ -121,6 +126,16 @@ erDiagram
     dim_customer     ||--o{ fact_payments  : "customer_key"
     dim_payment_type ||--o{ fact_payments  : "payment_type_key"
 ```
+
+---
+
+## Dashboard
+
+### Page 1 — Executive Overview
+
+![Executive Overview](docs\images\dashboard\page1_executive_overview.png)
+
+DAX Measures: [`powerbi/te_create_measures.csx`](powerbi/te_create_measures.csx)
 
 ---
 
@@ -232,6 +247,8 @@ Der SQL Server Agent Job (`agent_job_full_load.sql`) enthält zwei Steps: Prepro
 ```
 olist-ecommerce-dwh/
 ├── data/
+├── powerbi/
+│   └── te_create_measures.csx
 ├── analysis/
 │   └── eda/
 │       ├── eda_customers.sql
@@ -290,11 +307,13 @@ olist-ecommerce-dwh/
 
 | Tool                 | Verwendung                              |
 | -------------------- | --------------------------------------- |
-| **MS SQL Server**    | Datenbank, gesamte Pipeline-Logik       |
-| **SSMS**             | Entwicklung, Testing, lokale Ausführung |
-| **SQL Server Agent** | Job-Scheduling (produktive Ausführung)  |
-| **PowerShell**       | CSV-Vorverarbeitung                     |
-| **Git / GitHub**     | Versionierung                           |
+| **MS SQL Server**    | Datenbank, gesamte Pipeline-Logik                        |
+| **SSMS**             | Entwicklung, Testing, lokale Ausführung                  |
+| **SQL Server Agent** | Job-Scheduling (produktive Ausführung)                   |
+| **PowerShell**       | CSV-Vorverarbeitung                                      |
+| **Power BI Desktop** | Reporting, DAX Measures, Datenmodellierung|
+| **Tabular Editor 2** | Bulk-Erstellung von DAX Measures via C# Script           |
+| **Git / GitHub**     | Versionierung                                            |
 
 ---
 
@@ -307,7 +326,8 @@ olist-ecommerce-dwh/
 | RAW-Layer: Stored Procedures und EDAs (alle 9 Entitäten) | Abgeschlossen  |
 | CLEANSED-Layer: alle 9 Entitäten                         | Abgeschlossen  |
 | MART-Layer: 6 Dimensionen, 2 Faktentabellen              | Abgeschlossen  |
-| Power BI Reporting                                       | In Entwicklung        |
+| Power BI Reporting — Seite 1 (Executive Overview)        | Abgeschlossen  |
+| Power BI Reporting — Seiten 2–6                          | In Entwicklung |
 
 ---
 
