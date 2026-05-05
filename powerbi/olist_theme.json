@@ -1,0 +1,63 @@
+{
+  "name": "Olist E-Commerce Theme",
+
+  "dataColors": [
+    "#000053",
+    "#2E75B6",
+    "#1F8A70",
+    "#D4A017",
+    "#8E44AD",
+    "#C0392B",
+    "#7F8C8D"
+  ],
+
+  "background":  "#FFFFFF",
+  "foreground":  "#333333",
+  "tableAccent": "#000053",
+
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [{
+          "fontSize":   12,
+          "bold":       true,
+          "fontFamily": "Segoe UI",
+          "color":      { "solid": { "color": "#333333" } }
+        }],
+        "categoryAxis": [{ "showAxisTitle": false, "fontSize": 8 }],
+        "valueAxis": [{
+          "showAxisTitle":       false,
+          "fontSize":            8,
+          "gridlineShow":        true,
+          "gridlineColor":       { "solid": { "color": "#E5E7EB" } },
+          "gridlineTransparency": 25,
+          "gridlineStyle":       "solid",
+          "gridlineWidth":       1
+        }]
+      }
+    }
+  },
+
+  "textClasses": {
+    "callout": {
+      "fontSize":  28,
+      "fontFace":  "Segoe UI",
+      "color":     "#000053"
+    },
+    "title": {
+      "fontSize":  14,
+      "fontFace":  "Segoe UI",
+      "color":     "#333333"
+    },
+    "header": {
+      "fontSize":  12,
+      "fontFace":  "Segoe UI",
+      "color":     "#333333"
+    },
+    "label": {
+      "fontSize":  10,
+      "fontFace":  "Segoe UI",
+      "color":     "#666666"
+    }
+  }
+}
