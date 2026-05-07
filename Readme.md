@@ -143,6 +143,10 @@ erDiagram
 
 ![Sales & Product](docs/images/dashboard/page2_sales_and_product.png)
 
+### Page 3 — Delivery & Operations
+
+![Delivery & Operations](docs/images/dashboard/page3_delivery_and_operations.png)
+
 DAX Measures: [`powerbi/te_create_measures.csx`](powerbi/te_create_measures.csx)
 
 ---
