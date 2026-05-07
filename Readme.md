@@ -133,6 +133,8 @@ erDiagram
 
 ## Power BI Dashboard
 
+> **Hinweis:** Der Report ist auf den Zeitraum Januar 2017 – August 2018 eingeschränkt. Sep–Dez 2016 (Ramp-up, sehr geringes Volumen) und Sep 2018 (unvollständiger Abschlussmonat) sind aus den Visualisierungen ausgeblendet. Die zugrundeliegenden Mart-Tabellen enthalten den vollen Datensatz 2016–2018.
+
 ### Page 1 — Executive Overview
 
 ![Executive Overview](docs/images/dashboard/page1_executive_overview.png)
