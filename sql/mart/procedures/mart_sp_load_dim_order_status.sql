@@ -38,15 +38,15 @@ BEGIN
         INSERT INTO mart.dim_order_status (order_status_key, status_name, status_category, sort_order)
         SELECT v.order_status_key, v.status_name, v.status_category, v.sort_order
         FROM (VALUES
-            (-1, 'UNKNOWN',     'UNKNOWN',     0), 
-            ( 1, 'created',     'in_progress', 1),
-            ( 2, 'approved',    'in_progress', 2),
-            ( 3, 'invoiced',    'in_progress', 3),
-            ( 4, 'processing',  'in_progress', 4),
-            ( 5, 'shipped',     'in_progress', 5),
-            ( 6, 'delivered',   'completed',   6),
-            ( 7, 'canceled',    'canceled',    7),
-            ( 8, 'unavailable', 'canceled',    8)
+            (-1, 'Unknown',     'Unknown',      0),
+            ( 1, 'Created',     'In Progress',  1),
+            ( 2, 'Approved',    'In Progress',  2),
+            ( 3, 'Invoiced',    'In Progress',  3),
+            ( 4, 'Processing',  'In Progress',  4),
+            ( 5, 'Shipped',     'In Progress',  5),
+            ( 6, 'Delivered',   'Completed',    6),
+            ( 7, 'Canceled',    'Canceled',     7),
+            ( 8, 'Unavailable', 'Canceled',     8)
         ) AS v(order_status_key, status_name, status_category, sort_order)
         WHERE NOT EXISTS (
             SELECT 1 FROM mart.dim_order_status
