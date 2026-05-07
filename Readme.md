@@ -340,7 +340,8 @@ olist-ecommerce-dwh/
 | MART-Layer: 6 Dimensionen, 2 Faktentabellen              | Abgeschlossen  |
 | Power BI Reporting — Seite 1 (Executive Overview)        | Abgeschlossen  |
 | Power BI Reporting — Seite 2 (Sales & Product)           | Abgeschlossen  |
-| Power BI Reporting — Seiten 3–4                          | In Entwicklung |
+| Power BI Reporting — Seite 3 (Delivery & Operations)     | Abgeschlossen  |
+| Power BI Reporting — Seite 4 (Customer & Payments)       | In Entwicklung |
 
 ---
 
