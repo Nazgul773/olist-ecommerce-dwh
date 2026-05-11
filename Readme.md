@@ -2,7 +2,7 @@
 
 End-to-End Data Warehouse auf Basis des öffentlichen [Olist Brazilian E-Commerce Datensatzes](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — anonymisierte Echtdaten mit rund 100.000 Bestellungen aus der frühen Wachstumsphase (2016–2018).
 
-Olist ist eine brasilianische SaaS-Plattform, die kleinen und mittleren Unternehmen die gleichzeitige Listung auf 13+ Marktplätzen (Mercado Livre, Amazon BR, B2W u. a.) ermöglicht — 2021 mit 1,5 Mrd. USD bewertet und damit eines der größten brasilianischen E-Commerce-Startups.
+Olist ist eine brasilianische SaaS-Plattform, die kleinen und mittelständischen Unternehmen die gleichzeitige Listung ihrer Produkte auf über 13 Marktplätzen (u.a. Mercado Livre, Amazon BR und B2W) ermöglicht — 2021 mit 1,5 Mrd. USD bewertet und damit eines der größten brasilianischen E-Commerce-Startups.
 
 Ziel des Projekts ist der Aufbau eines produktionsnahen Data Warehouse in SQL Server mit Batch-Historisierung, inkrementellem Ladekonzept und vollständigem Audit-Trail. Implementiert werden gängige Patterns aus der Praxis: Metadata-Driven Orchestrierung über eine zentrale Konfigurationstabelle, Datenqualitätsprüfung, Soft Delete und transaktionssichere Stored Procedures.
 
