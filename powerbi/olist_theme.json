@@ -2,13 +2,13 @@
   "name": "Olist E-Commerce Theme",
 
   "dataColors": [
-    "#000053",
-    "#2E75B6",
-    "#1F8A70",
-    "#D4A017",
-    "#8E44AD",
-    "#C0392B",
-    "#7F8C8D"
+      "#2251CC",
+      "#1F8A70",
+      "#D4A017",
+      "#8E44AD",
+      "#C0392B",
+      "#7F8C8D",
+      "#2E75B6"
   ],
 
   "background":  "#FFFFFF",
