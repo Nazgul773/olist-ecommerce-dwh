@@ -1,59 +1,69 @@
-<svg width="100%" viewBox="0 0 720 640" role="img" xmlns="http://www.w3.org/2000/svg">
-<title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Data Warehouse Architecture — Olist E-Commerce DWH</title>
+<svg width="100%" viewBox="0 0 720 690" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>Data Warehouse Architecture – Olist E-Commerce DWH</title>
 <defs>
-<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-<path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-</marker>
+  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
 </defs>
 
 <!-- CSV Source -->
-<rect x="260" y="20" width="200" height="40" rx="8" fill="#4a4a4a" stroke="#666" stroke-width="0.5" style="fill:rgb(74, 74, 74);stroke:rgb(102, 102, 102);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="360" y="40" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="13" font-weight="600" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:13px;font-weight:600;text-anchor:middle;dominant-baseline:central">CSV-Dateien</text>
+<rect x="260" y="20" width="200" height="40" rx="8" fill="#4a4a4a" stroke="#666" stroke-width="0.5"/>
+<text x="360" y="40" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="13" font-weight="600" font-family="Segoe UI, sans-serif">CSV Source Files</text>
 
 <!-- Arrow CSV → Preprocessing -->
-<line x1="360" y1="60" x2="360" y2="88" stroke="#888" marker-end="url(#arrow)" stroke-width="1.5" style="fill:rgb(0, 0, 0);stroke:rgb(136, 136, 136);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<line x1="360" y1="60" x2="360" y2="88" stroke="#888" marker-end="url(#arrow)" stroke-width="1.5"/>
 
 <!-- Preprocessing -->
-<rect x="160" y="90" width="400" height="70" rx="10" fill="#3d3d3d" stroke="#666" stroke-width="0.5" style="fill:rgb(61, 61, 61);stroke:rgb(102, 102, 102);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="360" y="112" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="13" font-weight="600" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:13px;font-weight:600;text-anchor:middle;dominant-baseline:central">PREPROCESSING</text>
-<text x="360" y="132" text-anchor="middle" dominant-baseline="central" fill="#bbb" font-size="11" style="fill:rgb(187, 187, 187);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:11px;font-weight:400;text-anchor:middle;dominant-baseline:central">preprocess_all.ps1 · needs_preprocessing = 1</text>
-<text x="360" y="149" text-anchor="middle" dominant-baseline="central" fill="#bbb" font-size="11" style="fill:rgb(187, 187, 187);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:11px;font-weight:400;text-anchor:middle;dominant-baseline:central">Konvertierung: comma-delimited → pipe-delimited</text>
+<rect x="160" y="90" width="400" height="70" rx="10" fill="#3d3d3d" stroke="#666" stroke-width="0.5"/>
+<text x="360" y="108" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="13" font-weight="600" font-family="Segoe UI, sans-serif">PREPROCESSING</text>
+<text x="360" y="128" text-anchor="middle" dominant-baseline="central" fill="#bbb" font-size="11" font-family="Segoe UI, sans-serif">File-level change detection · Skip-if-unchanged</text>
+<text x="360" y="146" text-anchor="middle" dominant-baseline="central" fill="#bbb" font-size="11" font-family="Segoe UI, sans-serif">Parallel workers (RunspacePool) · Comma &#8594; Pipe-delimited · Quote-safe · UTF-8</text>
 
-<!-- Arrow Preprocessing → Raw -->
-<line x1="360" y1="160" x2="360" y2="188" stroke="#888" marker-end="url(#arrow)" stroke-width="1.5" style="fill:rgb(0, 0, 0);stroke:rgb(136, 136, 136);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<!-- Arrow Preprocessing → RAW -->
+<line x1="360" y1="160" x2="360" y2="186" stroke="#888" marker-end="url(#arrow)" stroke-width="1.5"/>
 
-<!-- RAW — dunkleres Bronze/Braun -->
-<rect x="160" y="190" width="400" height="90" rx="10" fill="#5c3a1e" stroke="#a0622a" stroke-width="1" style="fill:rgb(92, 58, 30);stroke:rgb(160, 98, 42);color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="360" y="213" text-anchor="middle" dominant-baseline="central" fill="#e8b87a" font-size="14" font-weight="700" style="fill:rgb(232, 184, 122);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:700;text-anchor:middle;dominant-baseline:central">RAW</text>
-<text x="360" y="236" text-anchor="middle" dominant-baseline="central" fill="#d4a060" font-size="11" style="fill:rgb(212, 160, 96);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:11px;font-weight:400;text-anchor:middle;dominant-baseline:central">Append-Only Staging · Batch-Historisierung · keine Transformation</text>
-<text x="360" y="254" text-anchor="middle" dominant-baseline="central" fill="#d4a060" font-size="11" style="fill:rgb(212, 160, 96);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:11px;font-weight:400;text-anchor:middle;dominant-baseline:central">Metafelder: batch_id · load_ts · file_name</text>
+<!-- RAW -->
+<rect x="160" y="188" width="400" height="72" rx="10" fill="#5c3a1e" stroke="#a0622a" stroke-width="1"/>
+<text x="360" y="208" text-anchor="middle" dominant-baseline="central" fill="#e8b87a" font-size="14" font-weight="700" font-family="Segoe UI, sans-serif">RAW</text>
+<text x="360" y="229" text-anchor="middle" dominant-baseline="central" fill="#d4a060" font-size="11" font-family="Segoe UI, sans-serif">Append-Only Staging · Batch historization · No transformation</text>
+<text x="360" y="246" text-anchor="middle" dominant-baseline="central" fill="#d4a060" font-size="11" font-family="Segoe UI, sans-serif">Meta columns: batch_id · load_ts · file_name</text>
 
-<!-- Arrow Raw → Cleansed + label centered -->
-<line x1="360" y1="280" x2="360" y2="318" stroke="#888" marker-end="url(#arrow)" stroke-width="1.5" style="fill:rgb(0, 0, 0);stroke:rgb(136, 136, 136);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="360" y="303" text-anchor="middle" fill="#888" font-size="10" style="fill:rgb(136, 136, 136);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:10px;font-weight:400;text-anchor:middle;dominant-baseline:auto">batch_id wird weitergegeben</text>
+<!-- Arrow RAW → CLEANSED + label -->
+<line x1="360" y1="260" x2="360" y2="287" stroke="#888" marker-end="url(#arrow)" stroke-width="1.5"/>
+<text x="360" y="276" text-anchor="middle" fill="#888" font-size="10" font-family="Segoe UI, sans-serif">batch_id propagated</text>
 
-<!-- CLEANSED — Silber -->
-<rect x="160" y="320" width="400" height="100" rx="10" fill="#4a4a5a" stroke="#9090b0" stroke-width="1" style="fill:rgb(74, 74, 90);stroke:rgb(144, 144, 176);color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="360" y="345" text-anchor="middle" dominant-baseline="central" fill="#d8d8f0" font-size="14" font-weight="700" style="fill:rgb(216, 216, 240);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:700;text-anchor:middle;dominant-baseline:central">CLEANSED</text>
-<text x="360" y="368" text-anchor="middle" dominant-baseline="central" fill="#c0c0d8" font-size="11" style="fill:rgb(192, 192, 216);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:11px;font-weight:400;text-anchor:middle;dominant-baseline:central">Inkrementelles Ladekonzept via MERGE · SHA2-256 Row-Hash</text>
-<text x="360" y="386" text-anchor="middle" dominant-baseline="central" fill="#c0c0d8" font-size="11" style="fill:rgb(192, 192, 216);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:11px;font-weight:400;text-anchor:middle;dominant-baseline:central">DQ-Checks: Completeness · Validity · Uniqueness</text>
-<text x="360" y="404" text-anchor="middle" dominant-baseline="central" fill="#c0c0d8" font-size="11" style="fill:rgb(192, 192, 216);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:11px;font-weight:400;text-anchor:middle;dominant-baseline:central">Soft Delete · quellengetreue Historisierung</text>
+<!-- CLEANSED -->
+<rect x="160" y="289" width="400" height="97" rx="10" fill="#4a4a5a" stroke="#9090b0" stroke-width="1"/>
+<text x="360" y="309" text-anchor="middle" dominant-baseline="central" fill="#d8d8f0" font-size="14" font-weight="700" font-family="Segoe UI, sans-serif">CLEANSED</text>
+<text x="360" y="331" text-anchor="middle" dominant-baseline="central" fill="#c0c0d8" font-size="11" font-family="Segoe UI, sans-serif">Incremental load via MERGE · SHA-256 row hash for change detection</text>
+<text x="360" y="348" text-anchor="middle" dominant-baseline="central" fill="#c0c0d8" font-size="11" font-family="Segoe UI, sans-serif">DQ checks: Completeness · Validity · Uniqueness</text>
+<text x="360" y="365" text-anchor="middle" dominant-baseline="central" fill="#c0c0d8" font-size="11" font-family="Segoe UI, sans-serif">Change history preserved · Soft delete</text>
 
-<!-- Arrow Cleansed → Mart -->
-<line x1="360" y1="420" x2="360" y2="448" stroke="#888" marker-end="url(#arrow)" stroke-width="1.5" style="fill:rgb(0, 0, 0);stroke:rgb(136, 136, 136);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<!-- Arrow CLEANSED → MART -->
+<line x1="360" y1="386" x2="360" y2="414" stroke="#888" marker-end="url(#arrow)" stroke-width="1.5"/>
 
-<!-- MART — Gold -->
-<rect x="160" y="450" width="400" height="100" rx="10" fill="#5a4a1a" stroke="#d4af37" stroke-width="1" style="fill:rgb(90, 74, 26);stroke:rgb(212, 175, 55);color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="360" y="475" text-anchor="middle" dominant-baseline="central" fill="#ffd700" font-size="14" font-weight="700" style="fill:rgb(255, 215, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:700;text-anchor:middle;dominant-baseline:central">MART</text>
-<text x="360" y="498" text-anchor="middle" dominant-baseline="central" fill="#f0c84a" font-size="11" style="fill:rgb(240, 200, 74);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:11px;font-weight:400;text-anchor:middle;dominant-baseline:central">Star-Schema · 6 Dimensionen · 2 Faktentabellen</text>
-<text x="360" y="516" text-anchor="middle" dominant-baseline="central" fill="#f0c84a" font-size="11" style="fill:rgb(240, 200, 74);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:11px;font-weight:400;text-anchor:middle;dominant-baseline:central">Dims: SCD Type 1 MERGE</text>
-<text x="360" y="534" text-anchor="middle" dominant-baseline="central" fill="#f0c84a" font-size="11" style="fill:rgb(240, 200, 74);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:11px;font-weight:400;text-anchor:middle;dominant-baseline:central">Facts: Full-Reload (TRUNCATE + INSERT)</text>
+<!-- MART -->
+<rect x="160" y="416" width="400" height="97" rx="10" fill="#5a4a1a" stroke="#d4af37" stroke-width="1"/>
+<text x="360" y="436" text-anchor="middle" dominant-baseline="central" fill="#ffd700" font-size="14" font-weight="700" font-family="Segoe UI, sans-serif">MART</text>
+<text x="360" y="458" text-anchor="middle" dominant-baseline="central" fill="#f0c84a" font-size="11" font-family="Segoe UI, sans-serif">Star-Schema · 6 Dimensions · 2 Fact Tables · Surrogate keys</text>
+<text x="360" y="475" text-anchor="middle" dominant-baseline="central" fill="#f0c84a" font-size="11" font-family="Segoe UI, sans-serif">Dims: SCD Type 1 (MERGE) · Facts: Full Reload (TRUNCATE + INSERT)</text>
+<text x="360" y="492" text-anchor="middle" dominant-baseline="central" fill="#f0c84a" font-size="11" font-family="Segoe UI, sans-serif">Referential integrity enforced pre-load</text>
+
+<!-- Arrow MART → Power BI -->
+<line x1="360" y1="513" x2="360" y2="541" stroke="#888" marker-end="url(#arrow)" stroke-width="1.5"/>
+
+<!-- Power BI -->
+<rect x="160" y="543" width="400" height="72" rx="10" fill="#111e3a" stroke="#2251CC" stroke-width="1"/>
+<text x="360" y="563" text-anchor="middle" dominant-baseline="central" fill="#7FA8FF" font-size="14" font-weight="700" font-family="Segoe UI, sans-serif">POWER BI</text>
+<text x="360" y="584" text-anchor="middle" dominant-baseline="central" fill="#AABFE8" font-size="11" font-family="Segoe UI, sans-serif">4-page e-commerce analytics dashboard</text>
+<text x="360" y="601" text-anchor="middle" dominant-baseline="central" fill="#AABFE8" font-size="11" font-family="Segoe UI, sans-serif">Sales · Product Mix · Operations · Customer &amp; Payments</text>
 
 <!-- Connector to foundation -->
-<line x1="360" y1="550" x2="360" y2="568" stroke="#666" stroke-width="0.5" stroke-dasharray="4 3" style="fill:rgb(0, 0, 0);stroke:rgb(102, 102, 102);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-dasharray:4px, 3px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<line x1="360" y1="615" x2="360" y2="631" stroke="#666" stroke-width="0.5" stroke-dasharray="4 3"/>
 
 <!-- Foundation -->
-<rect x="160" y="570" width="400" height="36" rx="8" fill="#3d3d3d" stroke="#666" stroke-width="0.5" style="fill:rgb(61, 61, 61);stroke:rgb(102, 102, 102);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="360" y="588" text-anchor="middle" dominant-baseline="central" fill="#bbb" font-size="12" font-weight="600" style="fill:rgb(187, 187, 187);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:600;text-anchor:middle;dominant-baseline:central">MS SQL Server · T-SQL · SQL Server Agent</text>
+<rect x="160" y="633" width="400" height="46" rx="8" fill="#3d3d3d" stroke="#666" stroke-width="0.5"/>
+<text x="360" y="650" text-anchor="middle" dominant-baseline="central" fill="#bbb" font-size="11" font-weight="600" font-family="Segoe UI, sans-serif">MS SQL Server · T-SQL · SQL Server Agent</text>
+<text x="360" y="668" text-anchor="middle" dominant-baseline="central" fill="#bbb" font-size="11" font-weight="600" font-family="Segoe UI, sans-serif">Power BI Desktop · DAX · Power Query (M)</text>
 
 </svg>
