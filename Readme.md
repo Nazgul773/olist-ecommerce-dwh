@@ -157,7 +157,7 @@ DAX Measures: [`powerbi/te_create_measures.csx`](powerbi/te_create_measures.csx)
 
 ---
 
-## Pipeline-Design
+## Data Warehouse Pipeline-Design
 
 ### Preprocessing — CSV-Konvertierung
 
